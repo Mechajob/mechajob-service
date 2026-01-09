@@ -286,7 +286,7 @@ textarea {
                 /* Gaya untuk gelembung chat */
 #chat-container {
     position: fixed;
-    top: 300px;
+    top: 100px;
     right: 20px;
     z-index: 999999; /* Sangat tinggi agar tidak tertutup menu */
     display: flex;
@@ -364,7 +364,7 @@ textarea {
             <div style="display: flex; align-items: center; gap: 18px;">
                 <div class="avatar-frame"><i class="fas fa-user-tie"></i></div>
                 <div>
-                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;">Name Customer/mekanik</h2>
+                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;">ARIF RAHMAN</h2>
                     <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
                 </div>
             </div>
@@ -571,7 +571,11 @@ textarea {
                 menuList.innerHTML = `
                     <div class="menu-row"><div class="menu-left"><i class="fas fa-credit-card"></i><span>Payment Methods</span></div><i class="fas fa-chevron-right"></i></div>
                     <div class="menu-row"><div class="menu-left"><i class="fas fa-map-marked-alt"></i><span>Saved Address</span></div><i class="fas fa-chevron-right"></i></div>
-                    <div class="menu-row" style="color: #ff4444;"><div class="menu-left"><i class="fas fa-power-off"></i><span>Logout</span></div></div>`;
+<div class="menu-row" id="logoutBtn" style="color: #ff4444;">
+  <div class="menu-left">
+    <i class="fas fa-power-off"></i><span>Logout</span>
+  </div>
+</div>`;
             }
         }
 
@@ -726,7 +730,8 @@ function sendMessage() {
 function handleEnter(e) {
     if (e.key === "Enter") sendMessage();
 }
-
     </script>
+<script src="js/logout.js"></script>
+
 </body>
 </html>
