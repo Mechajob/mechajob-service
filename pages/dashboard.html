@@ -364,7 +364,7 @@ textarea {
             <div style="display: flex; align-items: center; gap: 18px;">
                 <div class="avatar-frame"><i class="fas fa-user-tie"></i></div>
                 <div>
-                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;">Full Name</h2>
+                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;">ARIF RAHMAN</h2>
                     <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
                 </div>
             </div>
@@ -518,4 +518,215 @@ textarea {
                 <select id="jenis_kendaraan" name="jenis_kendaraan">
                     <option value="motor">Sepeda Motor</option>
                     <option value="mobil">Mobil</option>
-          
+                    <option value="truk">Truk/Lainnya</option>
+                </select>
+            </div>
+            <div class="form-group half">
+                <label for="type_kendaraan">Tipe/Model</label>
+                <input type="text" id="type_kendaraan" name="type_kendaraan" placeholder="Contoh: Vario 150">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="layanan">Jenis Layanan</label>
+            <select id="layanan" name="layanan">
+                <option value="servis_rutin">Servis Rutin</option>
+                <option value="perbaikan_berat">Perbaikan Berat</option>
+                <option value="body_repair">Body Repair</option>
+                <option value="darurat">Layanan Darurat</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="detail_kerusakan">Detail Kerusakan</label>
+            <textarea id="detail_kerusakan" name="detail_kerusakan" placeholder="Deskripsikan masalah kendaraan Anda..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="foto">Foto Kendaraan</label>
+            <input type="file" id="foto" name="foto" accept="image/*" class="file-input">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+            <label for="metode_bayar">Metode Transaksi</label>
+            <select id="metode_bayar" name="metode_bayar">
+                <option value="tunai">Tunai (Cash)</option>
+                <option value="transfer">Transfer Bank</option>
+                <option value="qris">QRIS / E-Wallet</option>
+            </select>
+        </div>
+        <button class="btn-order">CARI MEKANIK</button></div></div>
+    </form>
+</div>
+`;
+                wCont.innerHTML = `<div style="padding:24px"><h3>ACTIVITY</h3><div class="form-card">No recent activity.</div></div>`;
+
+                grid.innerHTML = `
+                    <div class="stat-item"><i class="fas fa-wallet"></i><small>Wallet</small><b>Rp 54k</b></div>
+                    <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Units</small><b>2</b></div>
+                    <div class="stat-item"><i class="fas fa-gift"></i><small>Points</small><b>1.2k</b></div>`;
+                
+                menuList.innerHTML = `
+                    <div class="menu-row"><div class="menu-left"><i class="fas fa-credit-card"></i><span>Payment Methods</span></div><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-row"><div class="menu-left"><i class="fas fa-map-marked-alt"></i><span>Saved Address</span></div><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-row" style="color: #ff4444;"><div class="menu-left"><i class="fas fa-power-off"></i><span>Logout</span></div></div>`;
+            }
+        }
+
+        // Initialize
+        setMode('customer');
+/* --- GLOBAL VARIABLES --- */
+let isDragging = false;
+let dragOccurred = false;
+let startX, startY;
+
+/* --- 1. EVENT DELEGATION (Penting agar fitur tidak mati saat pindah menu) --- */
+document.addEventListener("mousedown", (e) => { 
+    if(e.target.closest("#chat-bubble")) dragStart(e); 
+});
+
+document.addEventListener("touchstart", (e) => { 
+    if(e.target.closest("#chat-bubble")) dragStart(e); 
+}, { passive: false });
+
+document.addEventListener("mousemove", (e) => { 
+    if (isDragging) { dragOccurred = true; moveAt(e.clientX, e.clientY); } 
+});
+
+document.addEventListener("touchmove", (e) => { 
+    if (isDragging) { dragOccurred = true; moveAt(e.touches[0].clientX, e.touches[0].clientY); } 
+}, { passive: false });
+
+document.addEventListener("mouseup", () => { isDragging = false; });
+document.addEventListener("touchend", () => { isDragging = false; });
+
+// Delegasi klik untuk Buka/Tutup dan Kirim Pesan
+document.addEventListener("click", (e) => {
+    // Tombol Buka/Tutup
+    if (e.target.closest("#chat-bubble") || e.target.closest("#close-chat")) {
+        toggleChat();
+    }
+    // Tombol Kirim Pesan
+    if (e.target.closest(".chat-footer button")) {
+        sendMessage();
+    }
+});
+
+/* --- 2. DRAG LOGIC (Membatasi agar tidak keluar frame) --- */
+function dragStart(e) {
+    const container = document.getElementById("chat-container");
+    const windowChat = document.getElementById("chat-window");
+    if(!container) return;
+
+    isDragging = true;
+    dragOccurred = false;
+    
+    const rect = container.getBoundingClientRect();
+    const clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+
+    startX = clientX - rect.left;
+    startY = clientY - rect.top;
+
+    // Tutup jendela saat mulai geser agar ringan
+    if(windowChat) windowChat.classList.remove("active");
+}
+
+function moveAt(clientX, clientY) {
+    const container = document.getElementById("chat-container");
+    if(!container) return;
+
+    let x = clientX - startX;
+    let y = clientY - startY;
+
+    // Batasi dalam layar (Clamping)
+    const padding = 10;
+    const maxX = window.innerWidth - container.offsetWidth - padding;
+    const maxY = window.innerHeight - container.offsetHeight - padding;
+
+    x = Math.max(padding, Math.min(x, maxX));
+    y = Math.max(padding, Math.min(y, maxY));
+
+    container.style.right = "auto";
+    container.style.bottom = "auto";
+    container.style.left = x + "px";
+    container.style.top = y + "px";
+}
+
+/* --- 3. TOGGLE CHAT (Buka Atas/Bawah Berdasarkan Posisi) --- */
+function toggleChat() {
+    if (dragOccurred) return; // Jika baru selesai geser, jangan buka/tutup
+
+    const container = document.getElementById("chat-container");
+    const windowChat = document.getElementById("chat-window");
+    if(!container || !windowChat) return;
+
+    const isOpen = windowChat.classList.contains("active");
+
+    if (isOpen) {
+        // Logika Menutup
+        windowChat.classList.remove("active");
+        setTimeout(() => { 
+            if(!windowChat.classList.contains("active")) windowChat.style.display = "none"; 
+        }, 300);
+    } else {
+        // Logika Membuka
+        const rect = container.getBoundingClientRect();
+        const isAtBottom = rect.top > window.innerHeight / 2;
+        const isAtRight = rect.left > window.innerWidth / 2;
+
+        // Reset arah animasi
+        windowChat.style.top = "auto"; windowChat.style.bottom = "auto";
+        windowChat.style.left = "auto"; windowChat.style.right = "auto";
+
+        // ANIMASI ADAPTIF: Bawah buka ke Atas, Atas buka ke Bawah
+        if (isAtBottom) {
+            windowChat.style.bottom = "75px";
+            windowChat.style.transformOrigin = "bottom center";
+        } else {
+            windowChat.style.top = "75px";
+            windowChat.style.transformOrigin = "top center";
+        }
+
+        // Horizontal Adaptif agar tidak keluar frame
+        if (isAtRight) windowChat.style.right = "0";
+        else windowChat.style.left = "0";
+
+        windowChat.style.display = "flex";
+        // Timeout kecil agar transisi CSS 'active' berjalan
+        setTimeout(() => windowChat.classList.add("active"), 10);
+    }
+}
+
+/* --- 4. CHAT MESSAGING --- */
+function sendMessage() {
+    const input = document.getElementById("chat-input");
+    const messagesArea = document.getElementById("chat-messages");
+    if (!input || !input.value.trim()) return;
+
+    // Tambah pesan pengirim
+    const userHtml = `<div class="msg sent">${input.value}</div>`;
+    messagesArea.insertAdjacentHTML('beforeend', userHtml);
+    
+    const text = input.value;
+    input.value = "";
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+
+    // Simulasi balasan otomatis
+    setTimeout(() => {
+        const botHtml = `<div class="msg received">Siap! Kami sedang memproses informasi mengenai "${text}".</div>`;
+        messagesArea.insertAdjacentHTML('beforeend', botHtml);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }, 1000);
+}
+
+// Support tombol Enter
+function handleEnter(e) {
+    if (e.key === "Enter") sendMessage();
+}
+
+    </script>
+</body>
+</html>
