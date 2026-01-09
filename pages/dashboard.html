@@ -6,14 +6,347 @@
     <title>Mechajob - Modern Interface</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
- <link rel="stylesheet" href="css/main.css">
+    
+    <style>
+        /* --- 1. VARIABEL & GLOBAL STYLE --- */
+        :root {
+            --mecha-orange: #FF8C00;
+            --mecha-blue: #00D2FF;
+            --mecha-bg: #080808;
+            --mecha-panel: rgba(28, 28, 30, 0.7);
+            --mecha-text: #ffffff;
+            --mecha-dim: #929296;
+            --mecha-border: rgba(255, 255, 255, 0.1);
+            --current-accent: var(--mecha-orange);
+            --glass-blur: blur(15px);
+        }
 
+        body.mode-mechanic { --current-accent: var(--mecha-blue); }
+
+        body {
+            margin: 0;
+            background-color: var(--mecha-bg);
+            color: var(--mecha-text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- 2. ANIMASI HALAMAN --- */
+        .content-section { 
+            display: none; 
+            min-height: 100vh;
+            padding-bottom: 120px; 
+            animation: fadeIn 0.4s ease-out;
+        }
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 3. UI COMPONENTS (GLASSMORPHISM) --- */
+        .form-card {
+            background: var(--mecha-panel);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--mecha-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+        }
+
+        .btn-order {
+            width: 100%; 
+            background: linear-gradient(135deg, var(--current-accent), #fff);
+            color: #000; 
+            padding: 18px;
+            border: none; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-order:active { transform: scale(0.96); }
+
+        /* --- 4. NAVIGATION (FLOATING STYLE) --- */
+        .bottom-nav {
+            position: fixed; 
+            bottom: 25px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 450px;
+            height: 75px; 
+            background: rgba(18, 18, 18, 0.85); 
+            backdrop-filter: blur(20px);
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            border-radius: 25px;
+            border: 1px solid var(--mecha-border);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            z-index: 10000;
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: #555; 
+            flex: 1; 
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; transition: 0.3s; }
+        .nav-item span { font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .nav-item.active { color: var(--current-accent); }
+        .nav-item.active i { transform: translateY(-3px); text-shadow: 0 0 15px var(--current-accent); }
+
+        .pay-circle {
+            width: 65px; height: 65px; 
+            background: linear-gradient(135deg, var(--current-accent), #fff); 
+            color: #000;
+            display: flex; align-items: center; justify-content: center; font-size: 28px;
+            position: relative; top: -25px; 
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* --- 5. PROFILE & STATS --- */
+        .header-section {
+            background: linear-gradient(180deg, rgba(255,140,0,0.15) 0%, var(--mecha-bg) 100%);
+            padding: 50px 24px 30px 24px;
+        }
+        body.mode-mechanic .header-section {
+            background: linear-gradient(180deg, rgba(0,210,255,0.15) 0%, var(--mecha-bg) 100%);
+        }
+
+        .avatar-frame {
+            width: 70px; height: 70px; 
+            background: linear-gradient(135deg, #eee, #999);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: #000; font-size: 30px;
+        }
+
+        .mode-selector {
+            display: flex; background: #1a1a1c; padding: 4px; margin: 20px 24px;
+            border-radius: 14px; border: 1px solid var(--mecha-border);
+        }
+        .mode-btn { 
+            flex: 1; padding: 10px; text-align: center; font-size: 12px; 
+            font-weight: 700; color: #666; cursor: pointer; border-radius: 11px; 
+            transition: 0.3s;
+        }
+        .mode-btn.active { background: var(--current-accent); color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+        .stats-grid { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 24px; margin-bottom: 25px;
+        }
+        .stat-item { 
+            background: var(--mecha-panel); padding: 15px 5px; text-align: center; 
+            border-radius: 18px; border: 1px solid var(--mecha-border);
+        }
+        .stat-item i { font-size: 20px; color: var(--current-accent); margin-bottom: 8px; display: block;}
+        
+        /*..order menu*/
+.container {
+    width: 82%;
+background: linear-gradient(135deg, var(--current-accent), #fff);
+color: #000;
+padding: 18px;
+border: none;
+border-radius: 16px;
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 1px;
+cursor: pointer;
+transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+margin-left: 25px;
+}
+        .btn-order:active { transform: scale(0.96); }
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h2 {
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.header p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 20px;
+    
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.half {
+    flex: 1;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+}
+
+input[type="text"], 
+input[type="tel"], 
+select, 
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+}
+
+textarea {
+    height: 80px;
+    resize: none;
+}
+
+.file-input {
+    padding: 10px 0;
+    font-size: 13px;
+}
+
+.divider {
+    height: 1px;
+    background: #eee;
+    margin: 25px 0;
+}
+
+/* Button */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background-color: #0056b3;
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 480px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+        /* --- 6. MENU LIST --- */
+        .menu-list { padding: 0 24px; }
+        .menu-row { 
+            padding: 18px; display: flex; align-items: center; justify-content: space-between; 
+            background: var(--mecha-panel); margin-bottom: 10px; border-radius: 16px;
+            border: 1px solid var(--mecha-border);
+        }
+        .menu-left { display: flex; align-items: center; gap: 15px; }
+        .menu-left i { font-size: 20px; color: var(--current-accent); width: 25px; text-align: center; }
+
+        /* --- 7. TABLE STYLE --- */
+        .mecha-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .mecha-table th { color: var(--mecha-dim); font-size: 10px; text-align: left; padding: 10px; border-bottom: 1px solid var(--mecha-border); }
+        .mecha-table td { padding: 12px 10px; font-size: 12px; border-bottom: 1px solid var(--mecha-border); }
+        
+                /* Gaya untuk gelembung chat */
+#chat-container {
+    position: fixed;
+    bottom: 150px;
+    right: 20px;
+    z-index: 999999; /* Sangat tinggi agar tidak tertutup menu */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    touch-action: none;
+    pointer-events: none; /* Container transparan tidak menghalangi klik bawahnya */
+}
+
+#chat-bubble {
+    width: 60px; height: 60px;
+    background: #007bff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 24px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    pointer-events: auto; /* Aktifkan klik kembali */
+    user-select: none;
+}
+
+#chat-window {
+    width: 300px; height: 400px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: none; /* Dikontrol JS */
+    flex-direction: column;
+    overflow: hidden;
+    position: absolute;
+    pointer-events: auto;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    transform: scale(0.8);
+    opacity: 0;
+}
+
+#chat-window.active {
+    display: flex;
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Internal Chat Styling */
+.chat-header { background: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+.dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; margin-right: 5px; display: inline-block; }
+.chat-body { flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px; }
+.msg { padding: 8px 12px; border-radius: 12px; font-size: 14px; max-width: 80%; }
+.received { background: white; align-self: flex-start; border: 1px solid #eee; }
+.sent { background: #007bff; color: white; align-self: flex-end; }
+.chat-footer { padding: 10px; border-top: 1px solid #eee; display: flex; gap: 5px; background: white; }
+.chat-footer input { flex: 1; border: 1px solid #ddd; padding: 8px; border-radius: 20px; outline: none; }
+.chat-footer button { background: #007bff; border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
+
+    </style>
 </head>
 <body id="mainBody">
 
     <div id="home" class="content-section"></div>
     <div id="activity" class="content-section"></div>
-
+    
     <div id="pay" class="content-section">
         <div style="padding: 40px 24px; text-align: center;">
             <div class="form-card">
@@ -31,7 +364,7 @@
             <div style="display: flex; align-items: center; gap: 18px;">
                 <div class="avatar-frame"><i class="fas fa-user-tie"></i></div>
                 <div>
-                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;"> id="userNameDisplay"</h2>
+                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;">Full Name</h2>
                     <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
                 </div>
             </div>
@@ -45,7 +378,7 @@
         <div id="statsGrid" class="stats-grid"></div>
         <div id="mainMenuList" class="menu-list"></div>
     </div>
-
+    
     <nav class="bottom-nav">
         <div class="nav-item" onclick="switchPage(this, 'home')" id="navHome"></div>
         <div class="nav-item" onclick="switchPage(this, 'activity')" id="navOrder"></div>
@@ -55,8 +388,134 @@
         <div class="nav-item" onclick="switchPage(this, 'wallet')" id="navHistory"></div>
         <div class="nav-item active" onclick="switchPage(this, 'profile')" id="navProfile"></div>
     </nav>
-<head>
-     <script src="assets/js/main.js" defer></script>
-<script type="module" src="assets/js/profil.js"</script>
-</body>
-  </html>
+
+    <script>
+        function switchPage(el, id) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function setMode(mode) {
+            const body = document.getElementById('mainBody');
+            const role = document.getElementById('userRole');
+            const grid = document.getElementById('statsGrid');
+            const menuList = document.getElementById('mainMenuList');
+            const hCont = document.getElementById('home');
+            const aCont = document.getElementById('activity');
+            const wCont = document.getElementById('wallet');
+            const nH = document.getElementById('navHome');
+            const nO = document.getElementById('navOrder');
+            const nHi = document.getElementById('navHistory');
+            const nP = document.getElementById('navProfile');
+
+            if(mode === 'mechanic') {
+                body.classList.add('mode-mechanic');
+                document.getElementById('mechBtn').classList.add('active');
+                document.getElementById('custBtn').classList.remove('active');
+                role.innerText = "EXPERT MECHANIC • LEVEL 42";
+                role.style.color = "var(--mecha-blue)";
+
+                nH.innerHTML = '<i class="fas fa-chart-pie"></i><span>Dash</span>';
+                nO.innerHTML = '<i class="fas fa-satellite"></i><span>Cari</span>';
+                nHi.innerHTML = '<i class="fas fa-list-ul"></i><span>Logs</span>';
+                nP.innerHTML = '<i class="fas fa-screwdriver-wrench"></i><span>Base</span>';
+
+                hCont.innerHTML = `
+                    <div style="padding: 24px;">
+                        <h3 style="color:var(--mecha-blue); font-weight:800; margin-bottom:20px;">MECHANIC CONSOLE</h3>
+                        <div class="form-card" style="background: linear-gradient(135deg, rgba(0,210,255,0.1), transparent);">
+                            <small style="color:var(--mecha-dim); font-size:10px;">DAILY EARNINGS</small>
+                            <h1 style="margin:5px 0;">Rp 842.000</h1>
+                            <div style="color:#00ff88; font-size:11px; font-weight:700;"><i class="fas fa-arrow-up"></i> +12% dari kemarin</div>
+                        </div>
+                        <div class="form-card">
+                            <h4 style="margin:0 0 15px 0; font-size:12px; color:var(--mecha-blue);">RIWAYAT TERAKHIR</h4>
+                            <table class="mecha-table">
+                                <tr><td>Vario 150</td><td><b>Rp 85k</b></td><td><span style="color:#00ff88">DONE</span></td></tr>
+                                <tr><td>PCX 160</td><td><b>Rp 150k</b></td><td><span style="color:#00ff88">DONE</span></td></tr>
+                            </table>
+                        </div>
+                    </div>`;
+
+                aCont.innerHTML = `<div style="padding:50px; text-align:center"><div class="form-card"><i class="fas fa-compass fa-spin" style="font-size:40px; color:var(--mecha-blue); margin-bottom:15px;"></i><p>Scanning nearby requests...</p></div></div>`;
+                wCont.innerHTML = `<div style="padding:24px;"><h3>WORK LOGS</h3><div class="form-card">No logs found today.</div></div>`;
+
+                grid.innerHTML = `
+                    <div class="stat-item"><i class="fas fa-bolt"></i><small>Power</small><b>98%</b></div>
+                    <div class="stat-item"><i class="fas fa-star"></i><small>Rate</small><b>4.9</b></div>
+                    <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
+                
+                menuList.innerHTML = `
+                    <div class="menu-row"><div class="menu-left"><i class="fas fa-toolbox"></i><span>Equipment</span></div><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-row"><div class="menu-left"><i class="fas fa-wallet"></i><span>Withdraw Balance</span></div><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-row" style="color: #ff4444;"><div class="menu-left"><i class="fas fa-power-off"></i><span>Sign Out</span></div></div>`;
+
+            } else {
+                body.classList.remove('mode-mechanic');
+                document.getElementById('custBtn').classList.add('active');
+                document.getElementById('mechBtn').classList.remove('active');
+                role.innerText = "PREMIUM MEMBER • ELITE";
+                role.style.color = "var(--mecha-orange)";
+
+                nH.innerHTML = '<i class="fas fa-house"></i><span>Home</span>';
+                nO.innerHTML = '<i class="fas fa-plus-circle"></i><span>Order</span>';
+                nHi.innerHTML = '<i class="fas fa-receipt"></i><span>History</span>';
+                nP.innerHTML = '<i class="fas fa-user-circle"></i><span>Profile</span>';
+
+                hCont.innerHTML = `
+<div id="chat-container">
+    <div id="chat-window">
+        <div class="chat-header">
+            <div class="user-info">
+                <div class="dot"></div>
+                <strong>Customer Service</strong>
+            </div>
+            <button id="close-chat">&times;</button>
+        </div>
+        <div class="chat-body" id="chat-messages">
+            <div class="msg received">Halo! Ada yang bisa kami bantu?</div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Tulis pesan..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div id="chat-bubble">
+        <i class="fas fa-comments"></i>
+    </div>
+</div>
+
+`;
+
+                aCont.innerHTML = `<div style="padding:24px"><div class="form-card">
+
+    <div class="header">
+        <h3>Form Pesanan Layanan</h3>
+        <p>Silakan isi data kendaraan Anda di bawah ini</p>
+    </div>
+
+    <form action="#" method="post" enctype="multipart/form-data">
+        
+        <div class="form-group">
+            <label for="nama">Nama Lengkap</label>
+            <input type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telp">Nomor Telepon Aktif</label>
+            <input type="tel" id="telp" name="telp" placeholder="Contoh: 08123456789" required>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-row">
+            <div class="form-group half">
+                <label for="jenis_kendaraan">Jenis Kendaraan</label>
+                <select id="jenis_kendaraan" name="jenis_kendaraan">
+                    <option value="motor">Sepeda Motor</option>
+                    <option value="mobil">Mobil</option>
+          
