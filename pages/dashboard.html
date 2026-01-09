@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechajob - Modern Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ <link rel="stylesheet" href="style.css">
+
+</head>
+<body id="mainBody">
+
+    <div id="home" class="content-section"></div>
+    <div id="activity" class="content-section"></div>
+
+    <div id="pay" class="content-section">
+        <div style="padding: 40px 24px; text-align: center;">
+            <div class="form-card">
+                <div style="font-size: 40px; margin-bottom: 15px; color: var(--current-accent);"><i class="fas fa-qrcode"></i></div>
+                <h3 style="margin: 0 0 10px 0;">SCAN PEMBAYARAN</h3>
+                <p style="color: var(--mecha-dim); font-size: 13px;">Gunakan fitur ini saat transaksi selesai di lokasi pelanggan.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="wallet" class="content-section"></div>
+
+    <div id="profile" class="content-section active">
+        <div class="header-section">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <div class="avatar-frame"><i class="fas fa-user-tie"></i></div>
+                <div>
+                    <h2 style="margin:0; font-weight: 800; letter-spacing: -0.5px;"> id="userNameDisplay"</h2>
+                    <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mode-selector">
+            <div id="custBtn" class="mode-btn active" onclick="setMode('customer')">CUSTOMER</div>
+            <div id="mechBtn" class="mode-btn" onclick="setMode('mechanic')">MECHANIC (Pro)</div>
+        </div>
+
+        <div id="statsGrid" class="stats-grid"></div>
+        <div id="mainMenuList" class="menu-list"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item" onclick="switchPage(this, 'home')" id="navHome"></div>
+        <div class="nav-item" onclick="switchPage(this, 'activity')" id="navOrder"></div>
+        <div class="nav-item" onclick="switchPage(this, 'pay')">
+            <div class="pay-circle"><i class="fas fa-bolt"></i></div>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'wallet')" id="navHistory"></div>
+        <div class="nav-item active" onclick="switchPage(this, 'profile')" id="navProfile"></div>
+    </nav>
+<head>
+     <script src="assets/js/main.js" defer></script>
+<script type="module" src="assets/js/profil.js"</script>
+</body>
+  </html>
