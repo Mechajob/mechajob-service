@@ -26,7 +26,7 @@ project/
 3. Atau akses via GitHub Pages
 
 ## 🌐 Demo
-https://username.github.io/mechajob/
+https://mechajob.github.io/mechajob-service/
 
 ## ⚠️ Catatan
 - Project masih tahap pengembangan
