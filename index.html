@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MechaJob - Solusi Perbaikan Masa Kini</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --blue-primary: #2a6ed4;
+            --orange-accent: orangered;
+            --bg-dark: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at top left, var(--blue-primary), #1e293b, var(--bg-dark));
+            color: white;
+            overflow: hidden;
+        }
+
+        .opening-card {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        /* LOGO ANIMASI */
+        .logo-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 6s ease-in-out infinite;
+            box-shadow: 0 0 40px rgba(255, 69, 0, 0.2);
+        }
+
+        .logo-icon {
+            position: relative;
+            z-index: 3;
+            font-size: 50px;
+            color: var(--blue-primary);
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-name {
+            color: var(--orange-accent);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 4px;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        /* BUTTON GROUP */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        .btn-auth {
+            padding: 14px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-login {
+            background-color: var(--blue-primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(42, 110, 212, 0.3);
+        }
+
+        .btn-register {
+            background-color: white;
+            color: var(--blue-primary);
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+
+        /* DECOR */
+        .decor-blob {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--orange-accent);
+            filter: blur(150px);
+            opacity: 0.1;
+            top: -100px;
+            right: -100px;
+            z-index: 1;
+        }
+
+        /* ANIMATIONS */
+        @keyframes morph {
+            0%, 100% { border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); }
+            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; transform: rotate(180deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="decor-blob"></div>
+
+    <div class="opening-card">
+        <div class="logo-wrapper">
+            <div class="logo-circle"></div>
+            <i class="fas fa-tools logo-icon"></i>
+        </div>
+        
+        <span class="brand-name">MechaJob</span>
+        <h1>Selamat Datang</h1>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 10px;">Solusi perbaikan kendaraan masa kini.</p>
+        
+        <div class="btn-container">
+            <button class="btn-auth btn-login" onclick="window.location.href='pages/login.html'">
+                <i class="fas fa-sign-in-alt"></i> MULAI PERBAIKAN
+            </button>
+            
+        </div>
+
+        <div style="margin-top: 30px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px;">
+            &copy; 2026 MECHAJOB INDONESIA
+        </div>
+    </div>
+
+</body>
+  </html>
+  
