@@ -199,6 +199,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = "pages/dashboard/dashboard.html";
+  }
+});
         // Lihat/Sembunyikan Password
         window.togglePassword = (id, el) => {
             const x = document.getElementById(id);
@@ -251,7 +258,7 @@
             if(!email || !password) return alert("Silakan isi semua kolom!");
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "dashboard.html";
+                window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) { alert("Email atau Password salah!"); }
         };
 
@@ -276,7 +283,7 @@
                     createdAt: new Date()
                 });
                 alert("Registrasi Berhasil!");
-                window.location.href = "dashboard.html";
+                window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) { alert("Gagal: " + e.message); }
         };
     </script>
