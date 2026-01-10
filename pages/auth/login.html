@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechajob - Login & Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --mecha-orange: #ff9d00; 
+            --mecha-orange-hover: #e68a00;
+            --mecha-bg: #0a0a0a; 
+            --mecha-panel: #161616; 
+            --input-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-dim: #888888;
+            --danger: #ff4d4d;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            margin: 0; 
+            background: var(--mecha-bg); 
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 157, 0, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 157, 0, 0.05) 0%, transparent 40%);
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+
+        .auth-card { 
+            width: 95%; 
+            max-width: 400px; 
+            background: var(--mecha-panel); 
+            padding: 50px 35px; 
+            border-radius: 32px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            text-align: center;
+            margin: 20px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-container img {
+            height: 90px;
+            width: auto;
+            filter: drop-shadow(0 0 15px rgba(255, 157, 0, 0.2));
+        }
+
+        h2 {
+            margin: 0 0 35px 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--text-main);
+        }
+
+        .input-box { 
+            margin-bottom: 18px; 
+            position: relative;
+            text-align: left;
+        }
+
+        .input-box input { 
+            width: 100%; 
+            padding: 16px 45px 16px 20px; 
+            background: var(--input-bg); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: #fff; 
+            border-radius: 16px; 
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-box input:focus {
+            border-color: var(--mecha-orange);
+            background: #222;
+            box-shadow: 0 0 0 4px rgba(255, 157, 0, 0.1);
+        }
+
+        .input-box i.toggle-pass {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 11px;
+            margin-top: 5px;
+            display: none;
+            padding-left: 5px;
+        }
+
+        .btn-auth { 
+            width: 100%; 
+            background: var(--mecha-orange); 
+            color: #000;
+            padding: 18px; 
+            border: none; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 10px 20px rgba(255, 157, 0, 0.2);
+        }
+
+        .btn-auth:hover {
+            background: var(--mecha-orange-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 157, 0, 0.4);
+        }
+
+        .switch { 
+            text-align: center; 
+            margin-top: 30px; 
+            font-size: 13px; 
+            color: var(--text-dim); 
+            cursor: pointer;
+        }
+
+        .switch b { 
+            color: var(--mecha-orange); 
+            margin-left: 5px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <div class="logo-container">
+            <img src="assets/img/logo.png" alt="Mechajob Logo" onerror="this.src='https://via.placeholder.com/150x90/161616/ff9d00?text=MECHAJOB'">
+        </div>
+        
+        <h2 id="title">Login Mechajob</h2>
+        
+        <div id="formContent">
+            <div class="input-box">
+                <input type="email" id="login_email" placeholder="Email">
+            </div>
+            <div class="input-box">
+                <input type="password" id="login_password" placeholder="Password">
+                <i class="fa fa-eye toggle-pass" onclick="togglePassword('login_password', this)"></i>
+            </div>
+            <button class="btn-auth" onclick="handleLogin()">Masuk</button>
+        </div>
+        
+        <div class="switch" id="switchBtn" onclick="showRegister()">
+            Belum punya akun? <b>Daftar</b>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
+            authDomain: "mechajob-v3.firebaseapp.com",
+            projectId: "mechajob-v3",
+            storageBucket: "mechajob-v3.firebasestorage.app",
+            messagingSenderId: "987474678188",
+            appId: "1:987474678188:web:950ccca56653af0c51aa09"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Lihat/Sembunyikan Password
+        window.togglePassword = (id, el) => {
+            const x = document.getElementById(id);
+            if (x.type === "password") {
+                x.type = "text";
+                el.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                x.type = "password";
+                el.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        };
+
+        // Cek Kesamaan Sandi Real-time
+        window.validateConfirm = () => {
+            const p = document.getElementById('reg_password').value;
+            const c = document.getElementById('reg_confirm').value;
+            const msg = document.getElementById('error_confirm');
+            if (c !== "" && p !== c) {
+                msg.style.display = "block";
+                msg.innerText = "Sandi tidak sama!";
+            } else {
+                msg.style.display = "none";
+            }
+        };
+
+        window.showRegister = () => {
+            document.getElementById('title').innerText = "Buat Akun";
+            document.getElementById('formContent').innerHTML = `
+                <div class="input-box"><input type="text" id="reg_nama" placeholder="Nama Lengkap"></div>
+                <div class="input-box"><input type="tel" id="reg_noWa" placeholder="Nomor WhatsApp (noWa)"></div>
+                <div class="input-box"><input type="email" id="reg_email" placeholder="Email"></div>
+                <div class="input-box">
+                    <input type="password" id="reg_password" placeholder="Buat Kata Sandi">
+                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_password', this)"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="reg_confirm" placeholder="Konfirmasi Kata Sandi" oninput="validateConfirm()">
+                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_confirm', this)"></i>
+                    <div id="error_confirm" class="error-msg"></div>
+                </div>
+                <button class="btn-auth" onclick="handleRegister()">Daftar Sekarang</button>
+            `;
+            document.getElementById('switchBtn').innerHTML = "Sudah punya akun? <b>Login</b>";
+            document.getElementById('switchBtn').onclick = () => location.reload();
+        };
+
+        window.handleLogin = async () => {
+            const email = document.getElementById('login_email').value;
+            const password = document.getElementById('login_password').value;
+            if(!email || !password) return alert("Silakan isi semua kolom!");
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = "dashboard.html";
+            } catch (e) { alert("Email atau Password salah!"); }
+        };
+
+        window.handleRegister = async () => {
+            const nama = document.getElementById('reg_nama').value;
+            const noWa = document.getElementById('reg_noWa').value;
+            const email = document.getElementById('reg_email').value;
+            const password = document.getElementById('reg_password').value;
+            const confirm = document.getElementById('reg_confirm').value;
+
+            if(!nama || !noWa || !email || !password || !confirm) return alert("Isi semua kolom!");
+            if(password !== confirm) return alert("Sandi tidak sama!");
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    uid: cred.user.uid,
+                    name: nama,
+                    noWa: noWa,
+                    email: email,
+                    role: "customer",
+                    createdAt: new Date()
+                });
+                alert("Registrasi Berhasil!");
+                window.location.href = "dashboard.html";
+            } catch (e) { alert("Gagal: " + e.message); }
+        };
+    </script>
+</body>
+  </html>
