@@ -182,55 +182,72 @@
     </div>
 
         <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
-            authDomain: "mechajob-v3.firebaseapp.com",
-            projectId: "mechajob-v3",
-            storageBucket: "mechajob-v3.firebasestorage.app",
-            messagingSenderId: "987474678188",
-            appId: "1:987474678188:web:950ccca56653af0c51aa09"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
+        authDomain: "mechajob-v3.firebaseapp.com",
+        projectId: "mechajob-v3",
+        storageBucket: "mechajob-v3.firebasestorage.app",
+        messagingSenderId: "987474678188",
+        appId: "1:987474678188:web:950ccca56653af0c51aa09"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        window.showRegister = () => {
-            document.getElementById('title').innerText = "REGISTER";
-            document.getElementById('formContent').innerHTML = `
-                <div class="input-box"><input type="text" id="nama" placeholder="Nama Lengkap"></div>
-                <div class="input-box"><input type="email" id="email" placeholder="Email"></div>
-                <div class="input-box"><input type="password" id="password" placeholder="Password"></div>
-                <button class="btn-auth" onclick="handleRegister()">Buat Akun</button>
-            `;
-            document.getElementById('switchBtn').innerHTML = "Sudah punya akun? Login";
-            document.getElementById('switchBtn').onclick = () => location.reload();
-        };
+    // Fungsi Switch ke Register
+    window.showRegister = () => {
+        document.getElementById('title').innerText = "REGISTER";
+        document.getElementById('formContent').innerHTML = `
+            <div class="input-box"><input type="text" id="reg_nama" placeholder="Nama Lengkap"></div>
+            <div class="input-box"><input type="email" id="reg_email" placeholder="Email"></div>
+            <div class="input-box"><input type="password" id="reg_password" placeholder="Password"></div>
+            <button class="btn-auth" onclick="handleRegister()">Buat Akun</button>
+        `;
+        document.getElementById('switchBtn').innerHTML = "Sudah punya akun? <b>Login</b>";
+        document.getElementById('switchBtn').onclick = () => location.reload();
+    };
 
-        window.handleLogin = async () => {
-            try {
-                await signInWithEmailAndPassword(auth, email.value, password.value);
-                window.location.href = "pages/dashboard/dashboard.html";
-            } catch (e) { alert("Login Gagal!"); }
-        };
+    // Fungsi Login
+    window.handleLogin = async () => {
+        // Ambil elemen berdasarkan ID yang benar
+        const email = document.getElementById('login_email').value;
+        const pass = document.getElementById('login_password').value;
 
-        window.handleRegister = async () => {
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    uid: cred.user.uid,
-                    name: document.getElementById('name').value,
-                    email: email.value,
-                    role: "customer",
-                    createdAt: new Date()
-                });
-                window.location.href = "pages/dashboard/dashboard.html";
-            } catch (e) { alert(e.message); }
-        };
-    </script>
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+            window.location.href = "pages/dashboard/dashboard.html";
+        } catch (e) { 
+            console.error(e);
+            alert("Login Gagal: " + e.message); 
+        }
+    };
+
+    // Fungsi Register
+    window.handleRegister = async () => {
+        const nama = document.getElementById('reg_nama').value;
+        const email = document.getElementById('reg_email').value;
+        const pass = document.getElementById('reg_password').value;
+
+        try {
+            const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            await setDoc(doc(db, "users", cred.user.uid), {
+                uid: cred.user.uid,
+                name: nama,
+                email: email,
+                role: "customer",
+                createdAt: new Date()
+            });
+            window.location.href = "pages/dashboard/dashboard.html";
+        } catch (e) { 
+            alert("Registrasi Gagal: " + e.message); 
+        }
+    };
+</script>
+
 </body>
   </html>
