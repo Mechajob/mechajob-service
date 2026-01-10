@@ -279,6 +279,11 @@
                 window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) { alert("Gagal: " + e.message); }
         };
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.replace("../../index.html");
+    }
+});
     </script>
 </body>
   </html>
