@@ -9,9 +9,9 @@
 
     <style>
         :root {
-            --blue-primary: #2a6ed4;
-            --orange-accent: orangered;
-            --bg-dark: #0f172a;
+            --mecha-orange: #ff9d00;
+            --mecha-bg: #0f0f0f;
+            --mecha-panel: #1a1a1a;
         }
 
         * {
@@ -22,30 +22,31 @@
         }
 
         body {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at top left, var(--blue-primary), #1e293b, var(--bg-dark));
+            /* Gradient diperbaiki agar tidak terlalu mencolok */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
             color: white;
-            overflow: hidden;
+            overflow-x: hidden; /* Hanya sembunyikan horizontal */
         }
 
         .opening-card {
             text-align: center;
             position: relative;
             z-index: 2;
-            padding: 40px;
-            max-width: 450px;
-            width: 90%;
+            padding: 20px;
+            max-width: 400px; /* Ukuran card dibatasi agar tidak melebar */
+            width: 100%;
             animation: fadeIn 1.2s ease-out;
         }
 
         /* LOGO ANIMASI */
         .logo-wrapper {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 25px;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
             position: relative;
             display: flex;
             justify-content: center;
@@ -59,49 +60,48 @@
             background: white;
             border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%;
             animation: morph 6s ease-in-out infinite;
-            box-shadow: 0 0 40px rgba(255, 69, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 157, 0, 0.3);
         }
 
         .logo-icon {
             position: relative;
             z-index: 3;
-            font-size: 50px;
-            color: var(--blue-primary);
+            font-size: 40px;
+            color: var(--mecha-orange);
         }
 
         h1 {
             font-weight: 800;
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 5px;
-            background: linear-gradient(to right, #ffffff, #cbd5e1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #fff;
         }
 
         .brand-name {
-            color: var(--orange-accent);
+            color: var(--mecha-orange);
             text-transform: uppercase;
             font-weight: 800;
             letter-spacing: 4px;
-            font-size: 1rem;
-            margin-bottom: 30px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
             display: block;
         }
 
         /* BUTTON GROUP */
         .btn-container {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
+            justify-content: center; /* Memastikan tombol di tengah */
+            margin-top: 30px;
             opacity: 0;
             animation: fadeUp 0.8s ease forwards;
             animation-delay: 0.5s;
         }
 
         .btn-auth {
-            padding: 14px 25px;
-            border-radius: 12px;
+            padding: 16px 30px;
+            border-radius: 50px; /* Bentuk kapsul lebih modern */
+            width: 100%; /* Mengikuti lebar container */
+            max-width: 280px; /* Batas lebar tombol agar tidak terlalu panjang */
             font-weight: 700;
             font-size: 14px;
             text-transform: uppercase;
@@ -110,36 +110,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .btn-login {
-            background-color: var(--blue-primary);
-            color: white;
-            box-shadow: 0 10px 20px rgba(42, 110, 212, 0.3);
-        }
-
-        .btn-register {
-            background-color: white;
-            color: var(--blue-primary);
+            gap: 12px;
+            transition: all 0.3s ease;
+            background-color: var(--mecha-orange);
+            color: #000;
+            box-shadow: 0 10px 20px rgba(255, 157, 0, 0.2);
         }
 
         .btn-auth:hover {
             transform: translateY(-3px);
-            filter: brightness(1.1);
+            background-color: #e68a00;
+            box-shadow: 0 15px 25px rgba(255, 157, 0, 0.4);
         }
 
         /* DECOR */
         .decor-blob {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: var(--orange-accent);
-            filter: blur(150px);
+            width: 300px;
+            height: 300px;
+            background: var(--mecha-orange);
+            filter: blur(120px);
             opacity: 0.1;
-            top: -100px;
-            right: -100px;
+            top: -50px;
+            right: -50px;
             z-index: 1;
         }
 
@@ -169,23 +162,21 @@
             <div class="logo-circle"></div>
             <i class="fas fa-tools logo-icon"></i>
         </div>
-        
+
         <span class="brand-name">MechaJob</span>
         <h1>Selamat Datang</h1>
         <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 10px;">Solusi perbaikan kendaraan masa kini.</p>
-        
+
         <div class="btn-container">
-            <button class="btn-auth btn-login" onclick="window.location.href='pages/login.html'">
-                <i class="fas fa-sign-in-alt"></i> MULAI PERBAIKAN
+            <button class="btn-auth" onclick="window.location.href='pages/auth/login.html'">
+                MULAI PERBAIKAN <i class="fas fa-arrow-right"></i>
             </button>
-            
         </div>
 
-        <div style="margin-top: 30px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px;">
+        <div style="margin-top: 50px; font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 1px;">
             &copy; 2026 MECHAJOB INDONESIA
         </div>
     </div>
 
 </body>
-  </html>
-  
+</html>
