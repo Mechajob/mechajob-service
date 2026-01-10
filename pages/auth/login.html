@@ -251,7 +251,7 @@
             if(!email || !password) return alert("Silakan isi semua kolom!");
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "dashboard.html";
+                window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) { alert("Email atau Password salah!"); }
         };
 
@@ -276,7 +276,7 @@
                     createdAt: new Date()
                 });
                 alert("Registrasi Berhasil!");
-                window.location.href = "dashboard.html";
+                window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) { alert("Gagal: " + e.message); }
         };
     </script>
