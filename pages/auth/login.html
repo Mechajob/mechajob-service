@@ -181,7 +181,7 @@
         </div>
     </div>
 
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -199,91 +199,38 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Lihat/Sembunyikan Password
-        window.togglePassword = (id, el) => {
-            const x = document.getElementById(id);
-            if (x.type === "password") {
-                x.type = "text";
-                el.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                x.type = "password";
-                el.classList.replace("fa-eye-slash", "fa-eye");
-            }
-        };
-
-        // Cek Kesamaan Sandi Real-time
-        window.validateConfirm = () => {
-            const p = document.getElementById('reg_password').value;
-            const c = document.getElementById('reg_confirm').value;
-            const msg = document.getElementById('error_confirm');
-            if (c !== "" && p !== c) {
-                msg.style.display = "block";
-                msg.innerText = "Sandi tidak sama!";
-            } else {
-                msg.style.display = "none";
-            }
-        };
-
         window.showRegister = () => {
-            document.getElementById('title').innerText = "Buat Akun";
+            document.getElementById('title').innerText = "REGISTER";
             document.getElementById('formContent').innerHTML = `
-                <div class="input-box"><input type="text" id="reg_nama" placeholder="Nama Lengkap"></div>
-                <div class="input-box"><input type="tel" id="reg_noWa" placeholder="Nomor WhatsApp (noWa)"></div>
-                <div class="input-box"><input type="email" id="reg_email" placeholder="Email"></div>
-                <div class="input-box">
-                    <input type="password" id="reg_password" placeholder="Buat Kata Sandi">
-                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_password', this)"></i>
-                </div>
-                <div class="input-box">
-                    <input type="password" id="reg_confirm" placeholder="Konfirmasi Kata Sandi" oninput="validateConfirm()">
-                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_confirm', this)"></i>
-                    <div id="error_confirm" class="error-msg"></div>
-                </div>
-                <button class="btn-auth" onclick="handleRegister()">Daftar Sekarang</button>
+                <div class="input-box"><input type="text" id="nama" placeholder="Nama Lengkap"></div>
+                <div class="input-box"><input type="email" id="email" placeholder="Email"></div>
+                <div class="input-box"><input type="password" id="password" placeholder="Password"></div>
+                <button class="btn-auth" onclick="handleRegister()">Buat Akun</button>
             `;
-            document.getElementById('switchBtn').innerHTML = "Sudah punya akun? <b>Login</b>";
+            document.getElementById('switchBtn').innerHTML = "Sudah punya akun? Login";
             document.getElementById('switchBtn').onclick = () => location.reload();
         };
 
         window.handleLogin = async () => {
-            const email = document.getElementById('login_email').value;
-            const password = document.getElementById('login_password').value;
-            if(!email || !password) return alert("Silakan isi semua kolom!");
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "pages/dashboard/dashboard.html";
-            } catch (e) { alert("Email atau Password salah!"); }
+                await signInWithEmailAndPassword(auth, email.value, password.value);
+                window.location.href = "dashboard.html";
+            } catch (e) { alert("Login Gagal!"); }
         };
 
         window.handleRegister = async () => {
-            const nama = document.getElementById('reg_nama').value;
-            const noWa = document.getElementById('reg_noWa').value;
-            const email = document.getElementById('reg_email').value;
-            const password = document.getElementById('reg_password').value;
-            const confirm = document.getElementById('reg_confirm').value;
-
-            if(!nama || !noWa || !email || !password || !confirm) return alert("Isi semua kolom!");
-            if(password !== confirm) return alert("Sandi tidak sama!");
-
             try {
-                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                const cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
                 await setDoc(doc(db, "users", cred.user.uid), {
                     uid: cred.user.uid,
-                    nama: nama,
-                    noWa: noWa,
-                    email: email,
+                    name: document.getElementById('name').value,
+                    email: email.value,
                     role: "customer",
                     createdAt: new Date()
                 });
-                alert("Registrasi Berhasil!");
-                window.location.href = "pages/dashboard/dashboard.html";
-            } catch (e) { alert("Gagal: " + e.message); }
+                window.location.href = "dashboard.html";
+            } catch (e) { alert(e.message); }
         };
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.replace("../../index.html");
-    }
-});
     </script>
 </body>
   </html>
