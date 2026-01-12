@@ -104,11 +104,12 @@
             box-shadow: 0 10px 20px rgba(255, 157, 0, 0.2);
         }
         .btn-main:hover { transform: translateY(-3px); background: var(--mecha-orange-hover); }
-        .btn-main:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
+        .btn-main:disabled { background: #555; cursor: not-allowed; box-shadow: none; opacity: 0.7; }
 
         .switch { margin-top: 25px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
         .switch b { color: var(--mecha-orange); }
 
+        /* DECOR */
         .decor-blob {
             position: absolute; width: 400px; height: 400px;
             background: var(--mecha-orange); filter: blur(150px);
@@ -137,10 +138,6 @@
         <button class="btn-main" onclick="goToAuth()">
             MULAI PERBAIKAN <i class="fas fa-arrow-right"></i>
         </button>
-
-        <div style="margin-top: 50px; font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 1px;">
-            &copy; 2026 MECHAJOB INDONESIA
-        </div>
     </div>
 
     <div id="auth-section">
@@ -169,7 +166,6 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
             authDomain: "mechajob-v3.firebaseapp.com",
@@ -183,14 +179,12 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- UI NAVIGATION ---
+        // --- NAVIGATION ---
         window.goToAuth = () => {
             const landing = document.getElementById('landing-section');
             const authSec = document.getElementById('auth-section');
-
             landing.style.opacity = '0';
             landing.style.transform = 'scale(0.9)';
-            
             setTimeout(() => {
                 landing.style.display = 'none';
                 authSec.style.display = 'block';
@@ -203,16 +197,11 @@
 
         window.togglePassword = (id, el) => {
             const x = document.getElementById(id);
-            if (x.type === "password") {
-                x.type = "text";
-                el.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                x.type = "password";
-                el.classList.replace("fa-eye-slash", "fa-eye");
-            }
+            x.type = x.type === "password" ? "text" : "password";
+            el.classList.toggle("fa-eye");
+            el.classList.toggle("fa-eye-slash");
         };
 
-        // --- VALIDATION ---
         window.validateConfirm = () => {
             const p = document.getElementById('reg_password').value;
             const c = document.getElementById('reg_confirm').value;
@@ -225,28 +214,28 @@
             }
         };
 
-        // --- LOGIN ---
+        // --- CORE LOGIC ---
         window.handleLogin = async () => {
             const email = document.getElementById('login_email').value;
             const password = document.getElementById('login_password').value;
             const btn = document.getElementById('btnAction');
 
-            if(!email || !password) return alert("Silakan isi semua kolom!");
+            if(!email || !password) return alert("Isi semua kolom!");
             
             btn.disabled = true;
             btn.innerText = "Memproses...";
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "dashboard.html";
+                window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) {
-                alert("Gagal Login: Email atau Password salah.");
+                console.error(e);
+                alert("Login Gagal: Periksa Email & Password.");
                 btn.disabled = false;
                 btn.innerText = "Masuk";
             }
         };
 
-        // --- REGISTER ---
         window.showRegister = () => {
             document.getElementById('title').innerText = "BUAT AKUN";
             document.getElementById('formContent').innerHTML = `
@@ -277,13 +266,14 @@
             const btn = document.getElementById('btnAction');
 
             if(!nama || !noWa || !email || !password || !confirm) return alert("Lengkapi data!");
-            if(password !== confirm) return alert("Sandi konfirmasi tidak sama!");
+            if(password !== confirm) return alert("Sandi tidak cocok!");
 
             btn.disabled = true;
             btn.innerText = "Mendaftarkan...";
 
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, password);
+                // Bagian yang sering membuat macet jika Rules salah:
                 await setDoc(doc(db, "users", cred.user.uid), {
                     uid: cred.user.uid,
                     name: nama,
@@ -292,9 +282,10 @@
                     role: "customer",
                     createdAt: new Date()
                 });
-                alert("Berhasil Daftar!");
-                window.location.href = "dashboard.html";
+                alert("Registrasi Berhasil!");
+                window.location.href = "pages/dashboard/dashboard.html";
             } catch (e) {
+                console.error("Error Detail:", e);
                 alert("Gagal: " + e.message);
                 btn.disabled = false;
                 btn.innerText = "Daftar Sekarang";
