@@ -1,170 +1,6 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MechaJob - Solusi Perbaikan Masa Kini</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        :root {
-            --mecha-orange: #ff9d00;
-            --mecha-orange-hover: #e68a00;
-            --mecha-bg: #0a0a0a;
-            --mecha-panel: #161616;
-            --input-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-dim: #888888;
-            --danger: #ff4d4d;
-        }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-            color: white;
-            overflow: hidden;
-        }
-
-        /* --- LANDING PAGE SECTION --- */
-        #landing-section {
-            text-align: center;
-            position: absolute;
-            z-index: 10;
-            padding: 20px;
-            max-width: 400px;
-            width: 100%;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .logo-wrapper {
-            width: 100px; height: 100px;
-            margin: 0 auto 20px;
-            position: relative;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .logo-circle {
-            position: absolute; width: 100%; height: 100%;
-            background: white; border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 6s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(255, 157, 0, 0.3);
-        }
-
-        .logo-icon { position: relative; z-index: 3; font-size: 40px; color: var(--mecha-orange); }
-
-        h1 { font-weight: 800; font-size: 2rem; margin-bottom: 5px; color: #fff; }
-        .brand-name { color: var(--mecha-orange); text-transform: uppercase; font-weight: 800; letter-spacing: 4px; font-size: 0.9rem; margin-bottom: 10px; display: block; }
-
-        /* --- AUTH SECTION (LOGIN/REG) --- */
-        #auth-section {
-            display: none;
-            width: 95%;
-            max-width: 400px;
-            z-index: 20;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .auth-card {
-            background: var(--mecha-panel);
-            padding: 40px 30px;
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .input-box { margin-bottom: 15px; position: relative; text-align: left; }
-        .input-box input {
-            width: 100%; padding: 16px 45px 16px 20px;
-            background: var(--input-bg); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff; border-radius: 16px; font-size: 15px; outline: none; transition: 0.3s;
-        }
-        .input-box input:focus { border-color: var(--mecha-orange); }
-        .input-box i.toggle-pass { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-dim); cursor: pointer; }
-
-        .btn-main {
-            width: 100%; background: var(--mecha-orange); color: #000; padding: 18px; border: none;
-            border-radius: 50px; font-weight: 800; font-size: 14px; text-transform: uppercase;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 10px 20px rgba(255, 157, 0, 0.2);
-        }
-        .btn-main:hover { transform: translateY(-3px); background: var(--mecha-orange-hover); }
-        .btn-main:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
-
-        .switch { margin-top: 25px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
-        .switch b { color: var(--mecha-orange); }
-
-        /* DECOR */
-        .decor-blob {
-            position: absolute; width: 400px; height: 400px;
-            background: var(--mecha-orange); filter: blur(150px);
-            opacity: 0.1; top: -100px; right: -100px; z-index: 1;
-        }
-
-        @keyframes morph {
-            0%, 100% { border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); }
-            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; transform: rotate(180deg); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="decor-blob"></div>
-
-    <div id="landing-section">
-        <div class="logo-wrapper">
-            <div class="logo-circle"></div>
-            <i class="fas fa-tools logo-icon"></i>
-        </div>
-        <span class="brand-name">MechaJob</span>
-        <h1>Selamat Datang</h1>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 30px;">Solusi perbaikan kendaraan masa kini.</p>
-        
-        <button class="btn-main" onclick="goToAuth()">
-            MULAI PERBAIKAN <i class="fas fa-arrow-right"></i>
-        </button>
-
-        <div style="margin-top: 50px; font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 1px;">
-            &copy; 2026 MECHAJOB INDONESIA
-        </div>
-    </div>
-
-    <div id="auth-section">
-        <div class="auth-card">
-            <h2 id="title" style="margin-bottom: 25px; font-size: 18px; letter-spacing: 2px;">LOGIN MECHAJOB</h2>
-            
-            <div id="formContent">
-                <div class="input-box">
-                    <input type="email" id="login_email" placeholder="Email">
-                </div>
-                <div class="input-box">
-                    <input type="password" id="login_password" placeholder="Password">
-                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('login_password', this)"></i>
-                </div>
-                <button class="btn-main" id="btnAction" onclick="handleLogin()">Masuk</button>
-            </div>
-
-            <div class="switch" id="switchBtn" onclick="showRegister()">
-                Belum punya akun? <b>Daftar</b>
-            </div>
-        </div>
-    </div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -180,15 +16,12 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- UI NAVIGATION & ANIMATION ---
+    // --- UI NAVIGATION ---
     window.goToAuth = () => {
         const landing = document.getElementById('landing-section');
         const authSec = document.getElementById('auth-section');
-        if(!landing || !authSec) return;
-
         landing.style.opacity = '0';
         landing.style.transform = 'scale(0.9)';
-        
         setTimeout(() => {
             landing.style.display = 'none';
             authSec.style.display = 'block';
@@ -210,7 +43,6 @@
         }
     };
 
-    // --- VALIDATION REAL-TIME ---
     window.validateConfirm = () => {
         const p = document.getElementById('reg_password').value;
         const c = document.getElementById('reg_confirm').value;
@@ -218,34 +50,35 @@
         if (c !== "" && p !== c) {
             msg.style.display = "block";
             msg.innerText = "Sandi tidak sama!";
-            msg.style.color = "red";
-            msg.style.fontSize = "12px";
+            msg.style.color = "#ff4d4d";
         } else {
             msg.style.display = "none";
         }
     };
 
-    // --- AUTH LOGIC ---
+    // --- LOGIN LOGIC ---
     window.handleLogin = async () => {
         const email = document.getElementById('login_email').value;
         const password = document.getElementById('login_password').value;
         const btn = document.getElementById('btnAction');
 
-        if(!email || !password) return alert("Silakan isi semua kolom!");
+        if(!email || !password) return alert("Isi semua kolom!");
         
         btn.disabled = true;
         btn.innerText = "Memproses...";
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            // Redirect otomatis via onAuthStateChanged
+            // Redirect manual SETELAH login berhasil
+            window.location.href = "pages/dashboard/dashboard.html";
         } catch (e) {
-            alert("Gagal Login: Email atau Password salah.");
+            alert("Login Gagal: Periksa kembali email dan sandi Anda.");
             btn.disabled = false;
             btn.innerText = "Masuk";
         }
     };
 
+    // --- REGISTER LOGIC ---
     window.showRegister = () => {
         document.getElementById('title').innerText = "BUAT AKUN";
         document.getElementById('formContent').innerHTML = `
@@ -259,7 +92,7 @@
             <div class="input-box">
                 <input type="password" id="reg_confirm" placeholder="Konfirmasi Sandi" oninput="validateConfirm()">
                 <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_confirm', this)"></i>
-                <div id="error_confirm" style="display:none;"></div>
+                <div id="error_confirm" style="display:none; font-size:12px; margin-top:5px;"></div>
             </div>
             <button class="btn-main" id="btnAction" onclick="handleRegister()">Daftar Sekarang</button>
         `;
@@ -285,23 +118,19 @@
             const cred = await createUserWithEmailAndPassword(auth, email, password);
             await setDoc(doc(db, "users", cred.user.uid), {
                 uid: cred.user.uid,
-                nama: nama,
+                name: nama,
                 noWa: noWa,
                 email: email,
                 role: "customer",
                 createdAt: new Date()
             });
-            alert("Berhasil Daftar!");
-            // Redirect otomatis via onAuthStateChanged
+            alert("Registrasi Berhasil!");
+            // Redirect manual SETELAH register berhasil
+            window.location.href = "pages/dashboard/dashboard.html";
         } catch (e) {
             alert("Gagal: " + e.message);
             btn.disabled = false;
             btn.innerText = "Daftar Sekarang";
         }
     };
-
-
 </script>
-
-</body>
-</html>
