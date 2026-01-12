@@ -238,7 +238,7 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "pages/dashboard/dashboard.html";
+                window.location.href = "dashboard.html";
             } catch (e) {
                 alert("Gagal Login: Email atau Password salah.");
                 btn.disabled = false;
@@ -293,7 +293,7 @@
                     createdAt: new Date()
                 });
                 alert("Berhasil Daftar!");
-                window.location.href = "pages/dashboard/dashboard.html";
+                window.location.href = "dashboard.html";
             } catch (e) {
                 alert("Gagal: " + e.message);
                 btn.disabled = false;
