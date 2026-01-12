@@ -206,6 +206,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+  // 3. PASANG JEMBATAN DI SINI (Supaya order.html bisa baca)
+    window.mechaDb = db;
+    window.mechaAuth = auth;
+    window.mechaFirestore = { 
+        collection, 
+        addDoc, 
+        serverTimestamp 
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
