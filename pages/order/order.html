@@ -1,44 +1,86 @@
-<div id="activity" class="content-section">
-    <div style="padding: 60px 24px 20px 24px;">
-        <h2 id="activityTitle">Booking Mekanik</h2>
-        <p style="color: var(--mecha-dim); font-size: 14px; margin-top: -10px;">Pesan layanan perbaikan instan</p>
-    </div>
+<div class="form-card">
+    <h3 style="margin-top:0;">Pesan Mekanik</h3>
+    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Isi detail kendaraan Anda.</p>
+    
+    <label>UNIT KENDARAAN</label>
+    <select id="vehicleType">
+        <option value="Motor Matic">Motor Matic</option>
+        <option value="Motor Sport">Motor Sport</option>
+        <option value="Mobil">Mobil</option>
+    </select>
 
-    <div class="form-card">
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-size: 12px; color: var(--mecha-dim); margin-bottom: 8px;">JENIS KENDARAAN</label>
-            <select id="vehicleType" style="width: 100%; background: #1a1a1c; border: 1px solid var(--mecha-border); color: #fff; padding: 14px; border-radius: 12px; font-family: inherit;">
-                <option value="motor">Motor (Matic/Bebek/Sport)</option>
-                <option value="mobil">Mobil (Sedan/SUV/MPV)</option>
-            </select>
-        </div>
+    <label>JENIS LAYANAN</label>
+    <select id="serviceType">
+        <option value="Ganti Oli">Ganti Oli</option>
+        <option value="Service Rutin">Service Rutin</option>
+        <option value="Darurat">Mogok (Emergency)</option>
+    </select>
 
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-size: 12px; color: var(--mecha-dim); margin-bottom: 8px;">LAYANAN YANG DIBUTUHKAN</label>
-            <select id="serviceType" style="width: 100%; background: #1a1a1c; border: 1px solid var(--mecha-border); color: #fff; padding: 14px; border-radius: 12px; font-family: inherit;">
-                <option value="ganti-oli">Ganti Oli & Filter</option>
-                <option value="service-rutin">Service Rutin (Tune Up)</option>
-                <option value="ban-rem">Cek Ban & Rem</option>
-                <option value="kelistrikan">Masalah Kelistrikan/Aki</option>
-                <option value="darurat">Mogok (Emergency)</option>
-            </select>
-        </div>
+    <label>ALAMAT PENJEMPUTAN</label>
+    <textarea id="address" placeholder="Jln. Raya No... (Gg. depan Indomaret)"></textarea>
 
-        <div style="margin-bottom: 25px;">
-            <label style="display: block; font-size: 12px; color: var(--mecha-dim); margin-bottom: 8px;">CATATAN KELUHAN (OPSIONAL)</label>
-            <textarea id="bookingNote" placeholder="Contoh: Bunyi kasar di bagian mesin..." style="width: 100%; background: #1a1a1c; border: 1px solid var(--mecha-border); color: #fff; padding: 14px; border-radius: 12px; font-family: inherit; height: 80px; resize: none; box-sizing: border-box;"></textarea>
-        </div>
+    <label>CATATAN KELUHAN</label>
+    <textarea id="bookingNote" placeholder="Contoh: Mesin berbunyi kasar saat pagi..."></textarea>
 
-        <button class="btn-action" onclick="submitBooking()">
-            <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> KONFIRMASI PESANAN
-        </button>
-    </div>
-
-    <div style="padding: 0 24px;">
-        <div style="display: flex; gap: 15px; align-items: center; background: rgba(255,140,0,0.05); padding: 15px; border-radius: 16px; border: 1px dashed var(--mecha-orange);">
-            <i class="fas fa-shield-check" style="color: var(--mecha-orange); font-size: 24px;"></i>
-            <p style="font-size: 11px; margin: 0; line-height: 1.4;">Semua mekanik kami telah tersertifikasi dan mendapatkan proteksi garansi pengerjaan selama 7 hari.</p>
-        </div>
-    </div>
+    <button class="btn-action" id="btnBooking">
+        KONFIRMASI PESANAN
+    </button>
 </div>
 
+<script type="module">
+    // Kita panggil instance yang sudah ada dari Dashboard jika memungkinkan, 
+    // atau inisialisasi ulang jika berdiri sendiri.
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const db = getFirestore();
+    const auth = getAuth();
+
+    // Event Listener untuk tombol
+    document.getElementById('btnBooking').addEventListener('click', async () => {
+        const btn = document.getElementById('btnBooking');
+        const vehicle = document.getElementById('vehicleType').value;
+        const service = document.getElementById('serviceType').value;
+        const address = document.getElementById('address').value;
+        const note = document.getElementById('bookingNote').value;
+        const customerName = document.getElementById('profileNameDisplay')?.innerText || "Anonymous";
+
+        if (!address.trim() || !note.trim()) {
+            alert("Harap lengkapi Alamat dan Catatan.");
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            btn.innerText = "MENGIRIM...";
+
+            // Simpan ke Firestore
+            await addDoc(collection(db, "bookings"), {
+                uid: auth.currentUser.uid,
+                customerName: customerName,
+                vehicle: vehicle,
+                service: service,
+                address: address,
+                note: note,
+                status: "pending",
+                createdAt: serverTimestamp()
+            });
+
+            alert("Booking Berhasil Terkirim!");
+            
+            // Reset Form & Pindah Tab
+            document.getElementById('address').value = "";
+            document.getElementById('bookingNote').value = "";
+            
+            // Trigger klik navigasi logs di dashboard utama
+            document.getElementById('navHistory').click();
+
+        } catch (error) {
+            console.error(error);
+            alert("Gagal mengirim pesanan.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "KONFIRMASI PESANAN";
+        }
+    });
+</script>
