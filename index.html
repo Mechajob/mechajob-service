@@ -227,7 +227,7 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "pages/dashboard/dashboard.html";
+                window.location.href = "dashboard.html";
             } catch (e) {
                 console.error(e);
                 alert("Login Gagal: Periksa Email & Password.");
@@ -283,7 +283,7 @@
                     createdAt: new Date()
                 });
                 alert("Registrasi Berhasil!");
-                window.location.href = "pages/dashboard/dashboard.html";
+                window.location.href = "dashboard.html";
             } catch (e) {
                 console.error("Error Detail:", e);
                 alert("Gagal: " + e.message);
