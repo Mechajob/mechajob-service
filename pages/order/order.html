@@ -1,81 +1,182 @@
 <style>
-    .order-container { animation: slideUp 0.4s ease; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    
-    .order-label { display: block; font-size: 10px; font-weight: 800; color: var(--mecha-dim); margin: 15px 0 8px 0; letter-spacing: 1px; }
-    .order-input { 
-        width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--mecha-border);
-        color: #fff; padding: 14px; border-radius: 14px; font-family: inherit; outline: none; box-sizing: border-box;
+    .order-container { 
+        animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     }
-    textarea.order-input { height: 80px; resize: none; }
+    
+    @keyframes slideUp { 
+        from { opacity: 0; transform: translateY(40px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    .order-label { 
+        display: block; 
+        font-size: 10px; 
+        font-weight: 800; 
+        color: var(--mecha-dim); 
+        margin: 15px 0 8px 5px; 
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .order-input { 
+        width: 100%; 
+        background: rgba(255, 255, 255, 0.03); 
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff; 
+        padding: 16px; 
+        border-radius: 16px; 
+        font-family: 'Inter', sans-serif; 
+        font-size: 14px;
+        outline: none; 
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .order-input:focus {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: var(--mecha-orange);
+        box-shadow: 0 0 15px rgba(255, 140, 0, 0.2);
+    }
+
+    select.order-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF8C00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 16px;
+    }
+
+    textarea.order-input { 
+        min-height: 90px; 
+        resize: none; 
+    }
+
+    /* CSS TOMBOL KONFIRMASI */
+    .btn-order {
+        width: 100%;
+        background: linear-gradient(135deg, var(--mecha-orange), #ffb347);
+        color: #000;
+        padding: 18px;
+        border: none;
+        border-radius: 18px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(255, 140, 0, 0.2);
+    }
+
+    .btn-order:active { transform: scale(0.95); }
+
+    .btn-order:disabled {
+        background: #1a1a1c !important;
+        border: 1px solid var(--mecha-border);
+        color: #555 !important;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    .fa-spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <div class="form-card order-container">
-    <h3 style="margin:0 0 5px 0;">Pesan Mekanik</h3>
-    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Layanan servis panggil ke lokasi.</p>
-    
-    <span class="order-label">UNIT KENDARAAN</span>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 5px;">
+        <i class="fas fa-tools" style="color: var(--mecha-orange); font-size: 20px;"></i>
+        <h3 style="margin:0;">Pesan Mekanik</h3>
+    </div>
+    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px; padding-left: 32px;">Layanan servis panggil ke lokasi.</p>
+
+    <span class="order-label">Unit Kendaraan</span>
     <select id="vehicleType" class="order-input">
-        <option value="Motor">Motor</option>
-        <option value="Mobil">Mobil</option>
+        <option value="Motor Matic">Motor Matic</option>
+        <option value="Motor Sport">Motor Sport / Manual</option>
+        <option value="Mobil">Mobil Penumpang</option>
     </select>
 
-    <span class="order-label">JENIS LAYANAN</span>
+    <span class="order-label">Jenis Layanan</span>
     <select id="serviceType" class="order-input">
         <option value="Ganti Oli">Ganti Oli</option>
-        <option value="Service Rutin">Service Rutin</option>
-        <option value="Darurat">Mogok (Emergency)</option>
+        <option value="Service Rutin">Service Rutin (Tune Up)</option>
+        <option value="Ban & Rem">Cek Ban & Rem</option>
+        <option value="Darurat">Mogok / Emergency</option>
     </select>
 
-    <span class="order-label">ALAMAT</span>
-    <textarea id="address" class="order-input" placeholder="Input alamat lengkap..."></textarea>
+    <span class="order-label">Alamat Penjemputan</span>
+    <textarea id="address" class="order-input" placeholder="Jln. Raya No... (Contoh: Depan Masjid Al-Ikhlas)"></textarea>
 
-    <span class="order-label">CATATAN</span>
-    <textarea id="bookingNote" class="order-input" placeholder="Contoh: Keluhan mesin..."></textarea>
+    <span class="order-label">Catatan Keluhan</span>
+    <textarea id="bookingNote" class="order-input" placeholder="Contoh: Mesin berbunyi kasar, tarikan berat..."></textarea>
 
-    <button class="btn-action" id="btnBooking" style="margin-top:20px;">
-        KONFIRMASI PESANAN
+    <button class="btn-order" id="btnBooking">
+        <span>KONFIRMASI PESANAN</span>
+        <i class="fas fa-chevron-right" style="font-size: 12px;"></i>
     </button>
 </div>
 
 <script>
-    // Fungsi ini akan dijalankan secara manual oleh dashboard setelah fetch
     (function() {
         const btn = document.querySelector('#btnBooking');
         
         btn.onclick = async () => {
-            // Ambil Firebase instance dari window utama
+            // Mengambil instance Firebase dari window utama (Dashboard)
             const db = window.mechaDb; 
             const auth = window.mechaAuth;
             const { collection, addDoc, serverTimestamp } = window.mechaFirestore;
 
+            // Ambil data input
             const vehicle = document.querySelector('#vehicleType').value;
             const service = document.querySelector('#serviceType').value;
             const address = document.querySelector('#address').value;
             const note = document.querySelector('#bookingNote').value;
+            const customerName = document.querySelector('#profileNameDisplay')?.innerText || "User";
 
-            if (!address.trim() || !note.trim()) return alert("Isi alamat dan catatan!");
+            // Validasi
+            if (!address.trim() || !note.trim()) {
+                alert("Harap lengkapi Alamat dan Catatan Keluhan!");
+                return;
+            }
 
             try {
+                // Set Loading State
                 btn.disabled = true;
-                btn.innerText = "MENGIRIM...";
+                btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>MENGIRIM...</span>`;
 
+                // Kirim ke Firebase Firestore
                 await addDoc(collection(db, "bookings"), {
                     uid: auth.currentUser.uid,
-                    customerName: document.querySelector('#profileNameDisplay').innerText,
-                    vehicle, service, address, note,
+                    customerName: customerName,
+                    vehicle: vehicle,
+                    service: service,
+                    address: address,
+                    note: note,
                     status: "pending",
                     createdAt: serverTimestamp()
                 });
 
-                alert("Booking Berhasil!");
+                // Notifikasi Sukses
+                alert("Berhasil! Mekanik akan segera menghubungi Anda.");
+                
+                // Bersihkan form
+                document.querySelector('#address').value = "";
+                document.querySelector('#bookingNote').value = "";
+                
+                // Pindah ke tab riwayat (Logs)
                 document.querySelector('#navHistory').click();
-            } catch (e) {
-                console.error(e);
-                alert("Gagal mengirim.");
+
+            } catch (error) {
+                console.error("Error booking:", error);
+                alert("Gagal mengirim pesanan. Periksa koneksi internet Anda.");
             } finally {
+                // Kembalikan tombol ke keadaan semula
                 btn.disabled = false;
-                btn.innerText = "KONFIRMASI PESANAN";
+                btn.innerHTML = `<span>KONFIRMASI PESANAN</span> <i class="fas fa-chevron-right" style="font-size: 12px;"></i>`;
             }
         };
     })();
