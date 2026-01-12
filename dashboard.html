@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* CSS tetap sama seperti kode Anda sebelumnya */
         :root {
             --mecha-orange: #FF8C00;
             --mecha-blue: #00D2FF;
@@ -24,20 +23,12 @@
         body.mode-mechanic { --current-accent: var(--mecha-blue); }
 
         body {
-            margin: 0;
-            background-color: var(--mecha-bg);
-            color: var(--mecha-text);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            display: none; /* Disembunyikan dulu sampai login terverifikasi */
+            margin: 0; background-color: var(--mecha-bg); color: var(--mecha-text);
+            font-family: 'Inter', sans-serif; overflow-x: hidden;
+            display: none; /* Disembunyikan sampai login diverifikasi */
         }
 
-        .content-section { 
-            display: none; 
-            min-height: 100vh;
-            padding-bottom: 120px; 
-            animation: fadeIn 0.4s ease-out;
-        }
+        .content-section { display: none; min-height: 100vh; padding-bottom: 120px; animation: fadeIn 0.4s ease-out; }
         .content-section.active { display: block; }
 
         @keyframes fadeIn {
@@ -46,24 +37,15 @@
         }
 
         .form-card {
-            background: var(--mecha-panel);
-            backdrop-filter: var(--glass-blur);
-            border-radius: 24px;
-            padding: 24px;
-            border: 1px solid var(--mecha-border);
+            background: var(--mecha-panel); backdrop-filter: var(--glass-blur);
+            border-radius: 24px; padding: 24px; border: 1px solid var(--mecha-border);
             margin: 0 24px 20px 24px;
         }
 
         .btn-action {
-            width: 100%; 
-            background: linear-gradient(135deg, var(--current-accent), #fff);
-            color: #000; 
-            padding: 16px;
-            border: none; 
-            border-radius: 16px; 
-            font-weight: 800; 
-            text-transform: uppercase;
-            cursor: pointer;
+            width: 100%; background: linear-gradient(135deg, var(--current-accent), #fff);
+            color: #000; padding: 16px; border: none; border-radius: 16px; 
+            font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.3s;
         }
 
         .bottom-nav {
@@ -77,8 +59,7 @@
         .nav-item.active { color: var(--current-accent); }
 
         .pay-circle {
-            width: 65px; height: 65px; 
-            background: linear-gradient(135deg, var(--current-accent), #fff); 
+            width: 65px; height: 65px; background: linear-gradient(135deg, var(--current-accent), #fff); 
             color: #000; display: flex; align-items: center; justify-content: center; 
             font-size: 28px; position: relative; top: -25px; border-radius: 50%;
         }
@@ -87,8 +68,9 @@
             background: linear-gradient(180deg, rgba(255,140,0,0.15) 0%, var(--mecha-bg) 100%);
             padding: 50px 24px 30px 24px;
         }
+        body.mode-mechanic .header-section { background: linear-gradient(180deg, rgba(0,210,255,0.15) 0%, var(--mecha-bg) 100%); }
 
-        .mode-selector { display: flex; background: #1a1a1c; padding: 4px; margin: 20px 24px; border-radius: 14px; }
+        .mode-selector { display: flex; background: #1a1a1c; padding: 4px; margin: 20px 24px; border-radius: 14px; border: 1px solid var(--mecha-border); }
         .mode-btn { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #666; cursor: pointer; border-radius: 11px; }
         .mode-btn.active { background: var(--current-accent); color: #000; }
 
@@ -97,6 +79,7 @@
         .stat-item i { font-size: 20px; color: var(--current-accent); margin-bottom: 8px; display: block;}
 
         .menu-row { padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--mecha-panel); margin: 0 24px 10px 24px; border-radius: 16px; border: 1px solid var(--mecha-border); cursor: pointer; }
+        .menu-row i { color: var(--current-accent); }
     </style>
 </head>
 <body id="mainBody">
@@ -107,6 +90,21 @@
             <p style="color: var(--mecha-dim); font-size: 14px;">Bagaimana kondisi kendaraanmu hari ini?</p>
         </div>
         <div class="form-card" id="balanceCard"></div>
+    </div>
+
+    <div id="activity" class="content-section">
+        <div style="padding: 60px 24px 20px 24px;"><h2>Layanan</h2></div>
+        <div id="activityContent"></div>
+    </div>
+
+    <div id="pay" class="content-section">
+        <div style="padding: 80px 24px; text-align: center;">
+            <div class="form-card">
+                <div style="font-size: 50px; margin-bottom: 20px; color: var(--current-accent);"><i class="fas fa-qrcode"></i></div>
+                <h3>SCAN PEMBAYARAN</h3>
+                <button class="btn-action" style="margin-top: 20px;">Buka Kamera</button>
+            </div>
+        </div>
     </div>
 
     <div id="profile" class="content-section">
@@ -131,6 +129,8 @@
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchPage(this, 'home')"><i class="fas fa-house"></i><span>Home</span></div>
+        <div class="nav-item" onclick="switchPage(this, 'activity')"><i class="fas fa-plus-circle"></i><span>Order</span></div>
+        <div class="nav-item" onclick="switchPage(this, 'pay')"><div class="pay-circle"><i class="fas fa-bolt"></i></div></div>
         <div class="nav-item" onclick="switchPage(this, 'profile')"><i class="fas fa-user-circle"></i><span>Profil</span></div>
     </nav>
 
@@ -152,18 +152,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- PROTEKSI HALAMAN (SATPAM) ---
+        // --- PROTEKSI & AMBIL DATA ---
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "index.html"; 
             } else {
-                // Tampilkan Body setelah terverifikasi
                 document.body.style.display = "block";
-                
-                // Tarik data dari Firestore
-                const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
-
+                const docSnap = await getDoc(doc(db, "users", user.uid));
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('welcomeText').innerText = `Halo, ${data.name}!`;
@@ -178,10 +173,11 @@
             el.classList.add('active');
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
         window.handleLogout = async () => {
-            if(confirm("Logout dari akun?")) {
+            if(confirm("Keluar dari aplikasi?")) {
                 await signOut(auth);
                 window.location.href = "index.html";
             }
@@ -193,6 +189,7 @@
             const grid = document.getElementById('statsGrid');
             const menuList = document.getElementById('mainMenuList');
             const balanceCard = document.getElementById('balanceCard');
+            const actContent = document.getElementById('activityContent');
 
             if(mode === 'mechanic') {
                 body.classList.add('mode-mechanic');
@@ -200,10 +197,23 @@
                 document.getElementById('custBtn').classList.remove('active');
                 role.innerText = "EXPERT MECHANIC • LV. 42";
                 role.style.color = "var(--mecha-blue)";
-                
-                grid.innerHTML = `<div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div><div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
-                balanceCard.innerHTML = `<h1>Rp 450.000</h1><button class="btn-action">Withdraw</button>`;
-                menuList.innerHTML = `<div class="menu-row" style="color:#ff4444" onclick="handleLogout()"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+
+                grid.innerHTML = `
+                    <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
+                    <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
+                    <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
+
+                balanceCard.innerHTML = `<small>PENDAPATAN</small><h1>Rp 450.000</h1><button class="btn-action">Withdraw</button>`;
+
+                actContent.innerHTML = `<div class="form-card"><h3>Pesanan Masuk</h3><p>Vario 150 - Ganti Oli</p><button class="btn-action">Ambil</button></div>`;
+
+                menuList.innerHTML = `
+                    <div class="menu-row"><span>Status Bengkel (Aktif)</span><i class="fas fa-toggle-on"></i></div>
+                    <div class="menu-row"><span>Alat & Inventaris</span><i class="fas fa-toolbox"></i></div>
+                    <div class="menu-row"><span>Riwayat Kerja</span><i class="fas fa-history"></i></div>
+                    <div class="menu-row"><span>Pengaturan Bengkel</span><i class="fas fa-cog"></i></div>
+                    <div class="menu-row" style="color:#ff4444" onclick="handleLogout()"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+
             } else {
                 body.classList.remove('mode-mechanic');
                 document.getElementById('custBtn').classList.add('active');
@@ -211,13 +221,24 @@
                 role.innerText = "PREMIUM MEMBER • ELITE";
                 role.style.color = "var(--mecha-orange)";
 
-                grid.innerHTML = `<div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div><div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
-                balanceCard.innerHTML = `<h1>Rp 54.200</h1><button class="btn-action">Top Up</button>`;
-                menuList.innerHTML = `<div class="menu-row" style="color:#ff4444" onclick="handleLogout()"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+                grid.innerHTML = `
+                    <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div>
+                    <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>2</b></div>
+                    <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
+
+                balanceCard.innerHTML = `<small>SALDO MECHAPAY</small><h1>Rp 54.200</h1><button class="btn-action">Top Up</button>`;
+
+                actContent.innerHTML = `<div class="form-card"><h3>Pesan Mekanik</h3><p>Panggil mekanik ke lokasi Anda.</p><button class="btn-action">Booking</button></div>`;
+
+                menuList.innerHTML = `
+                    <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
+                    <div class="menu-row"><span>Garansi & Klaim</span><i class="fas fa-shield-halved"></i></div>
+                    <div class="menu-row"><span>Daftar Kendaraan</span><i class="fas fa-motorcycle"></i></div>
+                    <div class="menu-row"><span>Pusat Bantuan</span><i class="fas fa-headset"></i></div>
+                    <div class="menu-row" style="color:#ff4444" onclick="handleLogout()"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
             }
         };
 
-        // Init Default Mode
         setMode('customer');
     </script>
 </body>
