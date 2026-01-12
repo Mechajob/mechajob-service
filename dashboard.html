@@ -116,16 +116,16 @@
 
     <div id="home" class="content-section active">
         <div style="padding: 60px 24px 20px 24px;">
-            <h1 id="welcomeText" style="font-size: 24px; margin-bottom: 5px;">Halo, Arif!</h1>
+            <h1 id="welcomeText" style="font-size: 24px; margin-bottom: 5px;">Halo!</h1>
             <p style="color: var(--mecha-dim); font-size: 14px;">Bagaimana kondisi kendaraanmu hari ini?</p>
         </div>
-        <div class="form-card" id="balanceCard">
-            </div>
+        <div class="form-card" id="balanceCard"></div>
     </div>
 
     <div id="activity" class="content-section">
-                                <h3>Pesan Mekanik</h3>
-<iframe src="pages/order/order.html" style="width:100%; height:800px; border:none; overflow:hidden;"></iframe>
+        <div id="activityContent">
+            <div style="padding:40px; text-align:center; color:var(--mecha-dim);">Memuat layanan...</div>
+        </div>
     </div>
 
     <div id="pay" class="content-section">
@@ -147,18 +147,17 @@
     </div>
 
     <div id="profile" class="content-section">
-    <div class="header-section">
-        <div style="display: flex; align-items: center; gap: 18px;">
-            <div style="width: 70px; height: 70px; background: #333; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px;">
-                <i class="fas fa-user"></i>
-            </div>
-            <div>
-                <h2 id="profileNameDisplay" style="margin:0; font-weight: 800;">MEMUAT...</h2>
-                <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
+        <div class="header-section">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="width: 70px; height: 70px; background: #333; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h2 id="profileNameDisplay" style="margin:0; font-weight: 800;">MEMUAT...</h2>
+                    <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
+                </div>
             </div>
         </div>
-    </div>
-
 
         <div class="mode-selector">
             <div id="custBtn" class="mode-btn active" onclick="setMode('customer')">CUSTOMER</div>
@@ -186,10 +185,11 @@
             <i class="fas fa-user-circle"></i><span>Profil</span>
         </div>
     </nav>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
@@ -204,14 +204,10 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-  // 3. PASANG JEMBATAN DI SINI (Supaya order.html bisa baca)
+    // JEMBATAN GLOBAL
     window.mechaDb = db;
     window.mechaAuth = auth;
-    window.mechaFirestore = { 
-        collection, 
-        addDoc, 
-        serverTimestamp 
-    };
+    window.mechaFirestore = { collection, addDoc, serverTimestamp };
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -221,20 +217,9 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-
-                    // Update Nama di Profil
-                    const nameElement = document.getElementById('profileNameDisplay');
-                    if (nameElement) nameElement.innerText = data.name.toUpperCase();
-
-                    // Update Sambutan di Home
-                    const welcomeText = document.getElementById('welcomeText');
-                    if (welcomeText) welcomeText.innerText = `Halo, ${data.name}!`;
-
-                    // Update Role di Profil
-                    const roleElement = document.getElementById('userRole');
-                    if (roleElement) roleElement.innerText = (data.role || "MEMBER").toUpperCase();
-
-                    console.log("Data berhasil dimuat");
+                    document.getElementById('profileNameDisplay').innerText = data.name.toUpperCase();
+                    document.getElementById('welcomeText').innerText = `Halo, ${data.name}!`;
+                    document.getElementById('userRole').innerText = (data.role || "MEMBER").toUpperCase();
                 }
             } catch (error) {
                 console.error("Gagal memuat profil:", error);
@@ -251,7 +236,6 @@
         el.classList.add('active');
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function setMode(mode) {
@@ -266,149 +250,49 @@
             body.classList.add('mode-mechanic');
             document.getElementById('mechBtn').classList.add('active');
             document.getElementById('custBtn').classList.remove('active');
-            role.innerText = "EXPERT MECHANIC";
-            role.style.color = "var(--mecha-blue)";
-
+            
             grid.innerHTML = `
                 <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
                 <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
                 <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
 
-            balanceCard.innerHTML = `
-                <small style="color:var(--mecha-dim)">PENDAPATAN</small>
-                <h1 style="margin:5px 0">Rp 450.000</h1>
-                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Withdraw</button>`;
-
-            menuList.innerHTML = `
-                <div class="menu-row"><span>Status Bengkel</span><i class="fas fa-toggle-on"></i></div>
-                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+            balanceCard.innerHTML = `<small>PENDAPATAN</small><h1>Rp 0</h1><button class="btn-action" style="font-size:12px; padding:10px;">Withdraw</button>`;
+            
+            actContent.innerHTML = `<div class="form-card"><h3>Pesanan Masuk</h3><p>Belum ada pesanan di sekitarmu.</p></div>`;
+            
+            menuList.innerHTML = `<div class="menu-row"><span>Status Bengkel</span><i class="fas fa-toggle-on"></i></div>`;
         } else {
             body.classList.remove('mode-mechanic');
             document.getElementById('custBtn').classList.add('active');
             document.getElementById('mechBtn').classList.remove('active');
-            role.innerText = "PREMIUM MEMBER";
-            role.style.color = "var(--mecha-orange)";
 
             grid.innerHTML = `
-                <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div>
-                <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>2</b></div>
-                <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
+                <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>0k</b></div>
+                <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>1</b></div>
+                <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>0</b></div>`;
 
-            balanceCard.innerHTML = `
-                <small style="color:var(--mecha-dim)">SALDO MECHAPAY</small>
-                <h1 style="margin:5px 0">Rp 54.200</h1>
-                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Top Up</button>`;
+            balanceCard.innerHTML = `<small>SALDO MECHAPAY</small><h1>Rp 0</h1><button class="btn-action" style="font-size:12px; padding:10px;">Top Up</button>`;
 
-            menuList.innerHTML = `
-                <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
-                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+            // PANGGIL ORDER.HTML
+            fetch('pages/order/order.html')
+                .then(res => res.text())
+                .then(html => {
+                    actContent.innerHTML = html;
+                    const scripts = actContent.querySelectorAll("script");
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        newScript.text = oldScript.text;
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+                })
+                .catch(err => { actContent.innerHTML = "Gagal memuat form."; });
+
+            menuList.innerHTML = `<div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>`;
         }
     }
 
-    setMode('customer');
+    // Jalankan mode awal setelah semua elemen siap
+    window.onload = () => setMode('customer');
 </script>
-
-
-</script>
-    <script>
-
-
-
-        function switchPage(el, id) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-
-
-
-        function setMode(mode) {
-            const body = document.getElementById('mainBody');
-            const role = document.getElementById('userRole');
-            const grid = document.getElementById('statsGrid');
-            const menuList = document.getElementById('mainMenuList');
-
-            // Dashboard & Content Elements
-            const balanceCard = document.getElementById('balanceCard');
-            const actContent = document.getElementById('activityContent');
-            const histList = document.getElementById('historyList');
-            const welcome = document.getElementById('welcomeText');
-
-            if(mode === 'mechanic') {
-                body.classList.add('mode-mechanic');
-                document.getElementById('mechBtn').classList.add('active');
-                document.getElementById('custBtn').classList.remove('active');
-                role.innerText = "EXPERT MECHANIC • LV. 42";
-                role.style.color = "var(--mecha-blue)";
-                welcome.innerText = "Work Mode: ON";
-
-                // Update Stats
-                grid.innerHTML = `
-                    <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
-                    <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
-                    <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
-
-                // Update Balance Card
-                balanceCard.innerHTML = `
-                    <small style="color:var(--mecha-dim)">PENDAPATAN TOTAL</small>
-                    <h1 style="margin:5px 0">Rp 00.000</h1>
-                    <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Withdraw Saldo</button>`;
-
-                // Update Activity
-                actContent.innerHTML = `
-                    <div class="form-card">
-                        <h3>Pesanan Masuk</h3>
-                        <p style="font-size:12px; color:var(--mecha-dim)">1 pesanan di radius 2km</p>
-                        <hr style="border:0; border-top:1px solid var(--mecha-border); margin:15px 0;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>Vario 150 - Ganti Oli</span>
-                            <button class="btn-action" style="width:80px; padding:8px; font-size:10px;">Ambil</button>
-                        </div>
-                    </div>`;
-
-                // Update Menu
-                menuList.innerHTML = `
-                    <div class="menu-row"><span>Status Bengkel (Aktif)</span><i class="fas fa-toggle-on" style="color:#00ff88"></i></div>
-                    <div class="menu-row"><span>Alat & Inventaris</span><i class="fas fa-toolbox"></i></div>
-                    <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
-
-            } else {
-                body.classList.remove('mode-mechanic');
-                document.getElementById('custBtn').classList.add('active');
-                document.getElementById('mechBtn').classList.remove('active');
-                role.innerText = "PREMIUM MEMBER • ELITE";
-                role.style.color = "var(--mecha-orange)";
-                welcome.innerText = "Halo, Arif!";
-
-                // Update Stats
-                grid.innerHTML = `
-                    <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div>
-                    <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>2</b></div>
-                    <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
-
-                // Update Balance Card
-                balanceCard.innerHTML = `
-                    <small style="color:var(--mecha-dim)">SALDO MECHAPAY</small>
-                    <h1 style="margin:5px 0">Rp 00.000</h1>
-                    <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Top Up Saldo</button>`;
-
-                // Update Activity
-                actContent.innerHTML = `
-
-`;
-
-                // Update Menu
-                menuList.innerHTML = `
-                    <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
-                    <div class="menu-row"><span>Garansi & Klaim</span><i class="fas fa-shield-halved"></i></div>
-                    <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
-            }
-        }
-
-        // Jalankan mode awal
-        setMode('customer');
-    </script>
 </body>
 </html>
