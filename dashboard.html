@@ -123,7 +123,9 @@
             </div>
     </div>
 
-    <div id="activity" class="content-section"
+    <div id="activity" class="content-section">
+                                <h3>Pesan Mekanik</h3>
+<iframe src="pages/order/order.html" style="width:100%; height:800px; border:none; overflow:hidden;"></iframe>
     </div>
 
     <div id="pay" class="content-section">
@@ -156,7 +158,7 @@
             </div>
         </div>
     </div>
-    
+
 
         <div class="mode-selector">
             <div id="custBtn" class="mode-btn active" onclick="setMode('customer')">CUSTOMER</div>
@@ -202,6 +204,14 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+  // 3. PASANG JEMBATAN DI SINI (Supaya order.html bisa baca)
+    window.mechaDb = db;
+    window.mechaAuth = auth;
+    window.mechaFirestore = { 
+        collection, 
+        addDoc, 
+        serverTimestamp 
+    };
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -211,7 +221,7 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    
+
                     // Update Nama di Profil
                     const nameElement = document.getElementById('profileNameDisplay');
                     if (nameElement) nameElement.innerText = data.name.toUpperCase();
@@ -223,7 +233,7 @@
                     // Update Role di Profil
                     const roleElement = document.getElementById('userRole');
                     if (roleElement) roleElement.innerText = (data.role || "MEMBER").toUpperCase();
-                    
+
                     console.log("Data berhasil dimuat");
                 }
             } catch (error) {
@@ -386,8 +396,7 @@
 
                 // Update Activity
                 actContent.innerHTML = `
-                        <h3>Pesan Mekanik</h3>
-<iframe src="pages/order/order.html" style="width:100%; height:800px; border:none; overflow:hidden;"></iframe>
+
 `;
 
                 // Update Menu
