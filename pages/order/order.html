@@ -1,86 +1,82 @@
-<div class="form-card">
-    <h3 style="margin-top:0;">Pesan Mekanik</h3>
-    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Isi detail kendaraan Anda.</p>
+<style>
+    .order-container { animation: slideUp 0.4s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     
-    <label>UNIT KENDARAAN</label>
-    <select id="vehicleType">
-        <option value="Motor Matic">Motor Matic</option>
-        <option value="Motor Sport">Motor Sport</option>
+    .order-label { display: block; font-size: 10px; font-weight: 800; color: var(--mecha-dim); margin: 15px 0 8px 0; letter-spacing: 1px; }
+    .order-input { 
+        width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--mecha-border);
+        color: #fff; padding: 14px; border-radius: 14px; font-family: inherit; outline: none; box-sizing: border-box;
+    }
+    textarea.order-input { height: 80px; resize: none; }
+</style>
+
+<div class="form-card order-container">
+    <h3 style="margin:0 0 5px 0;">Pesan Mekanik</h3>
+    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Layanan servis panggil ke lokasi.</p>
+    
+    <span class="order-label">UNIT KENDARAAN</span>
+    <select id="vehicleType" class="order-input">
+        <option value="Motor">Motor</option>
         <option value="Mobil">Mobil</option>
     </select>
 
-    <label>JENIS LAYANAN</label>
-    <select id="serviceType">
+    <span class="order-label">JENIS LAYANAN</span>
+    <select id="serviceType" class="order-input">
         <option value="Ganti Oli">Ganti Oli</option>
         <option value="Service Rutin">Service Rutin</option>
         <option value="Darurat">Mogok (Emergency)</option>
     </select>
 
-    <label>ALAMAT PENJEMPUTAN</label>
-    <textarea id="address" placeholder="Jln. Raya No... (Gg. depan Indomaret)"></textarea>
+    <span class="order-label">ALAMAT</span>
+    <textarea id="address" class="order-input" placeholder="Input alamat lengkap..."></textarea>
 
-    <label>CATATAN KELUHAN</label>
-    <textarea id="bookingNote" placeholder="Contoh: Mesin berbunyi kasar saat pagi..."></textarea>
+    <span class="order-label">CATATAN</span>
+    <textarea id="bookingNote" class="order-input" placeholder="Contoh: Keluhan mesin..."></textarea>
 
-    <button class="btn-action" id="btnBooking">
+    <button class="btn-action" id="btnBooking" style="margin-top:20px;">
         KONFIRMASI PESANAN
     </button>
 </div>
 
-<script type="module">
-    // Kita panggil instance yang sudah ada dari Dashboard jika memungkinkan, 
-    // atau inisialisasi ulang jika berdiri sendiri.
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<script>
+    // Fungsi ini akan dijalankan secara manual oleh dashboard setelah fetch
+    (function() {
+        const btn = document.querySelector('#btnBooking');
+        
+        btn.onclick = async () => {
+            // Ambil Firebase instance dari window utama
+            const db = window.mechaDb; 
+            const auth = window.mechaAuth;
+            const { collection, addDoc, serverTimestamp } = window.mechaFirestore;
 
-    const db = getFirestore();
-    const auth = getAuth();
+            const vehicle = document.querySelector('#vehicleType').value;
+            const service = document.querySelector('#serviceType').value;
+            const address = document.querySelector('#address').value;
+            const note = document.querySelector('#bookingNote').value;
 
-    // Event Listener untuk tombol
-    document.getElementById('btnBooking').addEventListener('click', async () => {
-        const btn = document.getElementById('btnBooking');
-        const vehicle = document.getElementById('vehicleType').value;
-        const service = document.getElementById('serviceType').value;
-        const address = document.getElementById('address').value;
-        const note = document.getElementById('bookingNote').value;
-        const customerName = document.getElementById('profileNameDisplay')?.innerText || "Anonymous";
+            if (!address.trim() || !note.trim()) return alert("Isi alamat dan catatan!");
 
-        if (!address.trim() || !note.trim()) {
-            alert("Harap lengkapi Alamat dan Catatan.");
-            return;
-        }
+            try {
+                btn.disabled = true;
+                btn.innerText = "MENGIRIM...";
 
-        try {
-            btn.disabled = true;
-            btn.innerText = "MENGIRIM...";
+                await addDoc(collection(db, "bookings"), {
+                    uid: auth.currentUser.uid,
+                    customerName: document.querySelector('#profileNameDisplay').innerText,
+                    vehicle, service, address, note,
+                    status: "pending",
+                    createdAt: serverTimestamp()
+                });
 
-            // Simpan ke Firestore
-            await addDoc(collection(db, "bookings"), {
-                uid: auth.currentUser.uid,
-                customerName: customerName,
-                vehicle: vehicle,
-                service: service,
-                address: address,
-                note: note,
-                status: "pending",
-                createdAt: serverTimestamp()
-            });
-
-            alert("Booking Berhasil Terkirim!");
-            
-            // Reset Form & Pindah Tab
-            document.getElementById('address').value = "";
-            document.getElementById('bookingNote').value = "";
-            
-            // Trigger klik navigasi logs di dashboard utama
-            document.getElementById('navHistory').click();
-
-        } catch (error) {
-            console.error(error);
-            alert("Gagal mengirim pesanan.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "KONFIRMASI PESANAN";
-        }
-    });
+                alert("Booking Berhasil!");
+                document.querySelector('#navHistory').click();
+            } catch (e) {
+                console.error(e);
+                alert("Gagal mengirim.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "KONFIRMASI PESANAN";
+            }
+        };
+    })();
 </script>
