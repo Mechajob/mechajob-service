@@ -1,250 +1,372 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MechaJob Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechajob - Modern Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* --- 1. VARIABEL & GLOBAL STYLE --- */
+        :root {
+            --mecha-orange: #FF8C00;
+            --mecha-blue: #00D2FF;
+            --mecha-bg: #080808;
+            --mecha-panel: rgba(28, 28, 30, 0.7);
+            --mecha-text: #ffffff;
+            --mecha-dim: #929296;
+            --mecha-border: rgba(255, 255, 255, 0.1);
+            --current-accent: var(--mecha-orange);
+            --glass-blur: blur(15px);
+        }
 
-<style>
-:root{
---orange:#ff8c00;
---blue:#00d2ff;
---bg:#080808;
---panel:rgba(30,30,30,.7);
---border:rgba(255,255,255,.1);
---text:#fff;
---dim:#aaa;
---accent:var(--orange);
-}
+        body.mode-mechanic { --current-accent: var(--mecha-blue); }
 
-body.mode-mechanic{--accent:var(--blue);}
-body{
-margin:0;
-background:var(--bg);
-font-family:Inter,sans-serif;
-color:var(--text);
-}
+        body {
+            margin: 0;
+            background-color: var(--mecha-bg);
+            color: var(--mecha-text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-.content{display:none;min-height:100vh;padding-bottom:120px;}
-.content.active{display:block;animation:fade .4s;}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}}
+        /* --- 2. ANIMASI HALAMAN --- */
+        .content-section { 
+            display: none; 
+            min-height: 100vh;
+            padding-bottom: 120px; 
+            animation: fadeIn 0.4s ease-out;
+        }
+        .content-section.active { display: block; }
 
-.card{
-background:var(--panel);
-border:1px solid var(--border);
-border-radius:20px;
-padding:20px;
-margin:20px;
-backdrop-filter:blur(15px);
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-input,textarea,select{
-width:100%;
-background:#111;
-border:1px solid var(--border);
-color:#fff;
-padding:12px;
-border-radius:12px;
-margin-bottom:10px;
-}
+        /* --- 3. UI COMPONENTS --- */
+        .form-card {
+            background: var(--mecha-panel);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--mecha-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            margin: 0 24px 20px 24px;
+        }
 
-button{
-background:linear-gradient(135deg,var(--accent),#fff);
-border:none;
-padding:14px;
-border-radius:14px;
-font-weight:800;
-cursor:pointer;
-width:100%;
-}
+        .btn-action {
+            width: 100%; 
+            background: linear-gradient(135deg, var(--current-accent), #fff);
+            color: #000; 
+            padding: 16px;
+            border: none; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-.nav{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-max-width:420px;
-height:70px;
-display:flex;
-justify-content:space-around;
-align-items:center;
-background:#111;
-border-radius:25px;
-border:1px solid var(--border);
-}
+        .btn-action:active { transform: scale(0.96); }
+        .btn-action:disabled { opacity: 0.5; filter: grayscale(1); }
 
-.nav div{color:#555;text-align:center;flex:1}
-.nav .active{color:var(--accent)}
+        /* Style Form Input */
+        .order-label { display: block; font-size: 10px; font-weight: 800; color: var(--mecha-dim); margin: 15px 0 8px 0; letter-spacing: 1px; text-transform: uppercase; }
+        .order-input { 
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--mecha-border);
+            color: #fff; padding: 14px; border-radius: 14px; font-family: inherit; outline: none; box-sizing: border-box;
+        }
+        .order-input:focus { border-color: var(--current-accent); }
 
-.mode{
-display:flex;
-margin:15px;
-background:#111;
-border-radius:14px;
-overflow:hidden;
-}
-.mode div{
-flex:1;
-text-align:center;
-padding:10px;
-cursor:pointer;
-color:#666;
-font-weight:700;
-}
-.mode .active{
-background:var(--accent);
-color:#000;
-}
-</style>
+        /* --- 4. NAVIGATION --- */
+        .bottom-nav {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 450px; height: 75px; 
+            background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center; 
+            border-radius: 25px; border: 1px solid var(--mecha-border); z-index: 10000;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; flex: 1; cursor: pointer; transition: 0.3s; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+        .nav-item span { font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .nav-item.active { color: var(--current-accent); }
+
+        .pay-circle {
+            width: 65px; height: 65px; 
+            background: linear-gradient(135deg, var(--current-accent), #fff); 
+            color: #000; display: flex; align-items: center; justify-content: center; 
+            font-size: 28px; position: relative; top: -25px; border-radius: 50%;
+        }
+
+        /* --- 5. PROFILE & MODES --- */
+        .header-section {
+            background: linear-gradient(180deg, rgba(255,140,0,0.15) 0%, var(--mecha-bg) 100%);
+            padding: 50px 24px 30px 24px;
+        }
+        body.mode-mechanic .header-section { background: linear-gradient(180deg, rgba(0,210,255,0.15) 0%, var(--mecha-bg) 100%); }
+
+        .mode-selector { display: flex; background: #1a1a1c; padding: 4px; margin: 20px 24px; border-radius: 14px; border: 1px solid var(--mecha-border); }
+        .mode-btn { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #666; cursor: pointer; border-radius: 11px; }
+        .mode-btn.active { background: var(--current-accent); color: #000; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 24px; margin-bottom: 25px; }
+        .stat-item { background: var(--mecha-panel); padding: 15px 5px; text-align: center; border-radius: 18px; border: 1px solid var(--mecha-border); }
+        .stat-item i { font-size: 20px; color: var(--current-accent); margin-bottom: 8px; display: block;}
+
+        .menu-row { padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--mecha-panel); margin: 0 24px 10px 24px; border-radius: 16px; border: 1px solid var(--mecha-border); cursor: pointer; }
+        .menu-row:active { background: rgba(255,255,255,0.05); }
+    </style>
 </head>
+<body id="mainBody">
 
-<body id="body">
+    <div id="home" class="content-section active">
+        <div style="padding: 60px 24px 20px 24px;">
+            <h1 id="welcomeText" style="font-size: 24px; margin-bottom: 5px;">Halo, Arif!</h1>
+            <p style="color: var(--mecha-dim); font-size: 14px;">Bagaimana kondisi kendaraanmu hari ini?</p>
+        </div>
+        <div class="form-card" id="balanceCard"></div>
+    </div>
 
-<!-- HOME -->
-<div id="home" class="content active">
-<div style="padding:30px">
-<h2 id="welcome">Halo!</h2>
-<p style="color:var(--dim)">Aplikasi layanan mekanik online</p>
-</div>
-<div id="balance" class="card"></div>
-</div>
+    <div id="activity" class="content-section">
+        <div style="padding: 60px 24px 20px 24px;">
+            <h2 id="activityTitle">Layanan</h2>
+        </div>
+        <div id="activityContent"></div>
+    </div>
 
-<!-- ORDER -->
-<div id="order" class="content">
-<div id="orderContent"></div>
-</div>
+    <div id="pay" class="content-section">
+        <div style="padding: 80px 24px; text-align: center;">
+            <div class="form-card">
+                <div style="font-size: 50px; margin-bottom: 20px; color: var(--current-accent);"><i class="fas fa-qrcode"></i></div>
+                <h3 style="margin: 0 0 10px 0;">SCAN PEMBAYARAN</h3>
+                <p style="color: var(--mecha-dim); font-size: 13px;">Arahkan kamera ke kode QR mekanik untuk membayar.</p>
+                <button class="btn-action" style="margin-top: 20px;">Buka Kamera</button>
+            </div>
+        </div>
+    </div>
 
-<!-- PAY -->
-<div id="pay" class="content">
-<div class="card" style="text-align:center">
-<i class="fas fa-qrcode" style="font-size:60px;color:var(--accent)"></i>
-<h3>Scan Pembayaran</h3>
-<button>Buka Kamera</button>
-</div>
-</div>
+    <div id="wallet" class="content-section">
+        <div style="padding: 60px 24px 20px 24px;">
+            <h2>Riwayat</h2>
+        </div>
+        <div id="historyList"></div>
+    </div>
 
-<!-- HISTORY -->
-<div id="history" class="content">
-<div id="historyList"></div>
-</div>
+    <div id="profile" class="content-section">
+        <div class="header-section">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="width: 70px; height: 70px; background: #333; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h2 id="profileNameDisplay" style="margin:0; font-weight: 800;">MEMUAT...</h2>
+                    <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
+                </div>
+            </div>
+        </div>
 
-<!-- PROFILE -->
-<div id="profile" class="content">
-<div class="card">
-<h3 id="profileName">MEMUAT...</h3>
-<small id="role"></small>
-</div>
+        <div class="mode-selector">
+            <div id="custBtn" class="mode-btn active" onclick="setMode('customer')">CUSTOMER</div>
+            <div id="mechBtn" class="mode-btn" onclick="setMode('mechanic')">MECHANIC</div>
+        </div>
 
-<div class="mode">
-<div id="custBtn" class="active" onclick="setMode('customer')">CUSTOMER</div>
-<div id="mechBtn" onclick="setMode('mechanic')">MECHANIC</div>
-</div>
+        <div id="statsGrid" class="stats-grid"></div>
+        <div id="mainMenuList"></div>
+    </div>
 
-<div id="menu"></div>
-</div>
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage(this, 'home')" id="navHome">
+            <i class="fas fa-house"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'activity')" id="navOrder">
+            <i class="fas fa-plus-circle"></i><span>Order</span>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'pay')">
+            <div class="pay-circle"><i class="fas fa-bolt"></i></div>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'wallet')" id="navHistory">
+            <i class="fas fa-receipt"></i><span>Logs</span>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'profile')" id="navProfile">
+            <i class="fas fa-user-circle"></i><span>Profil</span>
+        </div>
+    </nav>
 
-<!-- NAV -->
-<div class="nav">
-<div class="active" onclick="nav(this,'home')"><i class="fa fa-house"></i></div>
-<div onclick="nav(this,'order')"><i class="fa fa-plus-circle"></i></div>
-<div onclick="nav(this,'pay')"><i class="fa fa-bolt"></i></div>
-<div onclick="nav(this,'history')"><i class="fa fa-receipt"></i></div>
-<div onclick="nav(this,'profile')"><i class="fa fa-user"></i></div>
-</div>
-
-<!-- FIREBASE -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth,onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore,collection,addDoc,getDocs,query,where,orderBy,serverTimestamp,doc,getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig={
-apiKey:"AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
-authDomain:"mechajob-v3.firebaseapp.com",
-projectId:"mechajob-v3"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
+        authDomain: "mechajob-v3.firebaseapp.com",
+        projectId: "mechajob-v3",
+        storageBucket: "mechajob-v3.firebasestorage.app",
+        messagingSenderId: "987474678188",
+        appId: "1:987474678188:web:950ccca56653af0c51aa09"
+    };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-window.logout=async()=>{
-await signOut(auth);
-location.href="index.html";
-}
+    // Global Order Function
+    window.kirimOrder = async () => {
+        const btn = document.getElementById('btnBooking');
+        if (!auth.currentUser) return alert("Silakan login!");
 
-window.sendOrder=async()=>{
-await addDoc(collection(db,"bookings"),{
-uid:auth.currentUser.uid,
-vehicle:vehicle.value,
-service:service.value,
-address:address.value,
-status:"pending",
-createdAt:serverTimestamp()
-});
-alert("Order terkirim");
-loadHistory();
-}
+        const data = {
+            uid: auth.currentUser.uid,
+            customerName: document.getElementById('inName').value,
+            whatsapp: document.getElementById('inWa').value,
+            vehicle: document.getElementById('inVehicle').value,
+            service: document.getElementById('inService').value,
+            address: document.getElementById('inAddress').value,
+            note: document.getElementById('inNote').value,
+            status: "pending",
+            createdAt: serverTimestamp()
+        };
 
-async function loadHistory(){
-historyList.innerHTML="";
-const q=query(collection(db,"bookings"),
-where("uid","==",auth.currentUser.uid),
-orderBy("createdAt","desc"));
-const snap=await getDocs(q);
-snap.forEach(d=>{
-historyList.innerHTML+=`
-<div class="card">
-<b>${d.data().vehicle}</b>
-<br><small>${d.data().service} • ${d.data().status}</small>
-</div>`;
-});
-}
+        if (!data.customerName || !data.address || !data.whatsapp) return alert("Mohon lengkapi data wajib!");
 
-onAuthStateChanged(auth,async(user)=>{
-if(!user)return location.href="index.html";
-const u=await getDoc(doc(db,"users",user.uid));
-profileName.innerText=u.data().name;
-welcome.innerText="Halo, "+u.data().name;
-loadHistory();
-});
+        try {
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
+            await addDoc(collection(db, "bookings"), data);
+            alert("Booking Berhasil!");
+            location.reload();
+        } catch (e) {
+            alert("Gagal: " + e.message);
+            btn.disabled = false; btn.innerText = "KONFIRMASI PESANAN";
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('profileNameDisplay').innerText = data.name.toUpperCase();
+                    document.getElementById('welcomeText').innerText = `Halo, ${data.name}!`;
+                    document.getElementById('userRole').innerText = (data.role || "MEMBER").toUpperCase();
+                }
+            } catch (error) { console.error(error); }
+        } else {
+            window.location.href = "index.html";
+        }
+    });
 </script>
 
 <script>
-function nav(el,id){
-document.querySelectorAll('.nav div').forEach(n=>n.classList.remove('active'));
-el.classList.add('active');
-document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
+    function switchPage(el, id) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
 
-function setMode(m){
-body.className=m==="mechanic"?"mode-mechanic":"";
-custBtn.classList.toggle("active",m==="customer");
-mechBtn.classList.toggle("active",m==="mechanic");
+    function setMode(mode) {
+        const body = document.getElementById('mainBody');
+        const role = document.getElementById('userRole');
+        const grid = document.getElementById('statsGrid');
+        const menuList = document.getElementById('mainMenuList');
+        const balanceCard = document.getElementById('balanceCard');
+        const actContent = document.getElementById('activityContent');
+        const welcome = document.getElementById('welcomeText');
 
-if(m==="customer"){
-balance.innerHTML="<h3>Saldo Rp 54.200</h3>";
-orderContent.innerHTML=`
-<div class="card">
-<input id="vehicle" placeholder="Kendaraan">
-<select id="service"><option>Ganti Oli</option></select>
-<textarea id="address" placeholder="Alamat"></textarea>
-<button onclick="sendOrder()">Pesan</button>
-</div>`;
-menu.innerHTML=`<div class="card" onclick="logout()">Logout</div>`;
-}else{
-balance.innerHTML="<h3>Pendapatan Rp 0</h3>";
-orderContent.innerHTML="<div class='card'>Pesanan Masuk</div>";
-menu.innerHTML=`<div class="card" onclick="logout()">Logout</div>`;
-}
-}
-setMode("customer");
+        if(mode === 'mechanic') {
+            body.classList.add('mode-mechanic');
+            document.getElementById('mechBtn').classList.add('active');
+            document.getElementById('custBtn').classList.remove('active');
+            role.innerText = "EXPERT MECHANIC • LV. 42";
+            role.style.color = "var(--mecha-blue)";
+            welcome.innerText = "Work Mode: ON";
+
+            grid.innerHTML = `
+                <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
+                <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
+                <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
+
+            balanceCard.innerHTML = `
+                <small style="color:var(--mecha-dim)">PENDAPATAN</small>
+                <h1 style="margin:5px 0">Rp 00.000</h1>
+                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Withdraw Saldo</button>`;
+
+            actContent.innerHTML = `
+                <div class="form-card">
+                    <h3>Pesanan Masuk</h3>
+                    <p style="font-size:12px; color:var(--mecha-dim)">1 pesanan di radius 2km</p>
+                    <hr style="border:0; border-top:1px solid var(--mecha-border); margin:15px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Vario 150 - Ganti Oli</span>
+                        <button class="btn-action" style="width:80px; padding:8px; font-size:10px;">Ambil</button>
+                    </div>
+                </div>`;
+
+            menuList.innerHTML = `
+                <div class="menu-row"><span>Status Bengkel (Aktif)</span><i class="fas fa-toggle-on" style="color:#00ff88"></i></div>
+                <div class="menu-row"><span>Alat & Inventaris</span><i class="fas fa-toolbox"></i></div>
+                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+        } else {
+            body.classList.remove('mode-mechanic');
+            document.getElementById('custBtn').classList.add('active');
+            document.getElementById('mechBtn').classList.remove('active');
+            role.innerText = "PREMIUM MEMBER • ELITE";
+            role.style.color = "var(--mecha-orange)";
+
+            grid.innerHTML = `
+                <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div>
+                <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>2</b></div>
+                <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
+
+            balanceCard.innerHTML = `
+                <small style="color:var(--mecha-dim)">SALDO MECHAPAY</small>
+                <h1 style="margin:5px 0">Rp 54.200</h1>
+                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Top Up Saldo</button>`;
+
+            actContent.innerHTML = `
+                <div class="form-card" style="margin:0 24px;">
+                    <h3 style="margin-bottom:5px;">Pesan Mekanik</h3>
+                    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Lengkapi data layanan kunjungan.</p>
+                    
+                    <span class="order-label">Nama Lengkap</span>
+                    <input type="text" id="inName" class="order-input" placeholder="Masukkan nama Anda">
+
+                    <span class="order-label">No. WhatsApp</span>
+                    <input type="number" id="inWa" class="order-input" placeholder="Contoh: 0812345678">
+
+                    <span class="order-label">Tipe/Merk Kendaraan</span>
+                    <input type="text" id="inVehicle" class="order-input" placeholder="Contoh: Honda Vario 150">
+
+                    <span class="order-label">Jenis Layanan</span>
+                    <select id="inService" class="order-input" style="background:#1a1a1c">
+                        <option>Ganti Oli</option>
+                        <option>Service Rutin</option>
+                        <option>Mogok (Emergency)</option>
+                    </select>
+
+                    <span class="order-label">Alamat Penjemputan</span>
+                    <textarea id="inAddress" class="order-input" style="height:80px;" placeholder="Jl. Nama Jalan, No, Patokan..."></textarea>
+
+                    <span class="order-label">Catatan Keluhan</span>
+                    <textarea id="inNote" class="order-input" style="height:80px;" placeholder="Apa masalah kendaraan Anda?"></textarea>
+
+                    <button class="btn-action" id="btnBooking" onclick="window.kirimOrder()" style="margin-top:25px;">KONFIRMASI PESANAN</button>
+                </div>`;
+
+            menuList.innerHTML = `
+                <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
+                <div class="menu-row"><span>Garansi & Klaim</span><i class="fas fa-shield-halved"></i></div>
+                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+        }
+    }
+    setMode('customer');
 </script>
-
 </body>
 </html>
