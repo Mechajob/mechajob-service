@@ -3,293 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MechaJob - Solusi Perbaikan Masa Kini</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Mechajob - Modern Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* --- 1. VARIABEL & GLOBAL STYLE --- */
         :root {
-            --mecha-orange: #ff9d00;
-            --mecha-orange-hover: #e68a00;
-            --mecha-bg: #0a0a0a;
-            --mecha-panel: #161616;
-            --input-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-dim: #888888;
-            --danger: #ff4d4d;
+            --mecha-orange: #FF8C00;
+            --mecha-blue: #00D2FF;
+            --mecha-bg: #080808;
+            --mecha-panel: rgba(28, 28, 30, 0.7);
+            --mecha-text: #ffffff;
+            --mecha-dim: #929296;
+            --mecha-border: rgba(255, 255, 255, 0.1);
+            --current-accent: var(--mecha-orange);
+            --glass-blur: blur(15px);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
+        body.mode-mechanic { --current-accent: var(--mecha-blue); }
+
+        body {
+            margin: 0;
+            background-color: var(--mecha-bg);
+            color: var(--mecha-text);
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        /* --- 2. ANIMASI HALAMAN --- */
+        .content-section { 
+            display: none; 
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-            color: white;
-            overflow: hidden;
+            padding-bottom: 120px; 
+            animation: fadeIn 0.4s ease-out;
+        }
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- LANDING PAGE SECTION --- */
-        #landing-section {
-            text-align: center;
-            position: absolute;
-            z-index: 10;
-            padding: 20px;
-            max-width: 400px;
-            width: 100%;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .logo-wrapper {
-            width: 100px; height: 100px;
-            margin: 0 auto 20px;
-            position: relative;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .logo-circle {
-            position: absolute; width: 100%; height: 100%;
-            background: white; border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 6s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(255, 157, 0, 0.3);
-        }
-
-        .logo-icon { position: relative; z-index: 3; font-size: 40px; color: var(--mecha-orange); }
-
-        h1 { font-weight: 800; font-size: 2rem; margin-bottom: 5px; color: #fff; }
-        .brand-name { color: var(--mecha-orange); text-transform: uppercase; font-weight: 800; letter-spacing: 4px; font-size: 0.9rem; margin-bottom: 10px; display: block; }
-
-        /* --- AUTH SECTION (LOGIN/REG) --- */
-        #auth-section {
-            display: none;
-            width: 95%;
-            max-width: 400px;
-            z-index: 20;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .auth-card {
+        /* --- 3. UI COMPONENTS --- */
+        .form-card {
             background: var(--mecha-panel);
-            padding: 40px 30px;
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--mecha-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            margin: 0 24px 20px 24px;
         }
 
-        .input-box { margin-bottom: 15px; position: relative; text-align: left; }
-        .input-box input {
-            width: 100%; padding: 16px 45px 16px 20px;
-            background: var(--input-bg); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff; border-radius: 16px; font-size: 15px; outline: none; transition: 0.3s;
-        }
-        .input-box input:focus { border-color: var(--mecha-orange); }
-        .input-box i.toggle-pass { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-dim); cursor: pointer; }
-
-        .btn-main {
-            width: 100%; background: var(--mecha-orange); color: #000; padding: 18px; border: none;
-            border-radius: 50px; font-weight: 800; font-size: 14px; text-transform: uppercase;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 10px 20px rgba(255, 157, 0, 0.2);
-        }
-        .btn-main:hover { transform: translateY(-3px); background: var(--mecha-orange-hover); }
-        .btn-main:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
-
-        .switch { margin-top: 25px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
-        .switch b { color: var(--mecha-orange); }
-
-        /* DECOR */
-        .decor-blob {
-            position: absolute; width: 400px; height: 400px;
-            background: var(--mecha-orange); filter: blur(150px);
-            opacity: 0.1; top: -100px; right: -100px; z-index: 1;
+        .btn-action {
+            width: 100%; 
+            background: linear-gradient(135deg, var(--current-accent), #fff);
+            color: #000; 
+            padding: 16px;
+            border: none; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        @keyframes morph {
-            0%, 100% { border-radius: 35% 65% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); }
-            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; transform: rotate(180deg); }
+        .btn-action:active { transform: scale(0.96); }
+        .btn-action:disabled { opacity: 0.5; filter: grayscale(1); }
+
+        /* Style Form Input */
+        .order-label { display: block; font-size: 10px; font-weight: 800; color: var(--mecha-dim); margin: 15px 0 8px 0; letter-spacing: 1px; text-transform: uppercase; }
+        .order-input { 
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--mecha-border);
+            color: #fff; padding: 14px; border-radius: 14px; font-family: inherit; outline: none; box-sizing: border-box;
         }
+        .order-input:focus { border-color: var(--current-accent); }
+
+        /* --- 4. NAVIGATION --- */
+        .bottom-nav {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 450px; height: 75px; 
+            background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center; 
+            border-radius: 25px; border: 1px solid var(--mecha-border); z-index: 10000;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; flex: 1; cursor: pointer; transition: 0.3s; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+        .nav-item span { font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .nav-item.active { color: var(--current-accent); }
+
+        .pay-circle {
+            width: 65px; height: 65px; 
+            background: linear-gradient(135deg, var(--current-accent), #fff); 
+            color: #000; display: flex; align-items: center; justify-content: center; 
+            font-size: 28px; position: relative; top: -25px; border-radius: 50%;
+        }
+
+        /* --- 5. PROFILE & MODES --- */
+        .header-section {
+            background: linear-gradient(180deg, rgba(255,140,0,0.15) 0%, var(--mecha-bg) 100%);
+            padding: 50px 24px 30px 24px;
+        }
+        body.mode-mechanic .header-section { background: linear-gradient(180deg, rgba(0,210,255,0.15) 0%, var(--mecha-bg) 100%); }
+
+        .mode-selector { display: flex; background: #1a1a1c; padding: 4px; margin: 20px 24px; border-radius: 14px; border: 1px solid var(--mecha-border); }
+        .mode-btn { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #666; cursor: pointer; border-radius: 11px; }
+        .mode-btn.active { background: var(--current-accent); color: #000; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 24px; margin-bottom: 25px; }
+        .stat-item { background: var(--mecha-panel); padding: 15px 5px; text-align: center; border-radius: 18px; border: 1px solid var(--mecha-border); }
+        .stat-item i { font-size: 20px; color: var(--current-accent); margin-bottom: 8px; display: block;}
+
+        .menu-row { padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--mecha-panel); margin: 0 24px 10px 24px; border-radius: 16px; border: 1px solid var(--mecha-border); cursor: pointer; }
+        .menu-row:active { background: rgba(255,255,255,0.05); }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
-    <div class="decor-blob"></div>
-
-    <div id="landing-section">
-        <div class="logo-wrapper">
-            <div class="logo-circle"></div>
-            <i class="fas fa-tools logo-icon"></i>
+    <div id="home" class="content-section active">
+        <div style="padding: 60px 24px 20px 24px;">
+            <h1 id="welcomeText" style="font-size: 24px; margin-bottom: 5px;">Halo, Arif!</h1>
+            <p style="color: var(--mecha-dim); font-size: 14px;">Bagaimana kondisi kendaraanmu hari ini?</p>
         </div>
-        <span class="brand-name">MechaJob</span>
-        <h1>Selamat Datang</h1>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 30px;">Solusi perbaikan kendaraan masa kini.</p>
-        
-        <button class="btn-main" onclick="goToAuth()">
-            MULAI PERBAIKAN <i class="fas fa-arrow-right"></i>
-        </button>
-
-        <div style="margin-top: 50px; font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 1px;">
-            &copy; 2026 MECHAJOB INDONESIA
-        </div>
+        <div class="form-card" id="balanceCard"></div>
     </div>
 
-    <div id="auth-section">
-        <div class="auth-card">
-            <h2 id="title" style="margin-bottom: 25px; font-size: 18px; letter-spacing: 2px;">LOGIN MECHAJOB</h2>
-            
-            <div id="formContent">
-                <div class="input-box">
-                    <input type="email" id="login_email" placeholder="Email">
-                </div>
-                <div class="input-box">
-                    <input type="password" id="login_password" placeholder="Password">
-                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('login_password', this)"></i>
-                </div>
-                <button class="btn-main" id="btnAction" onclick="handleLogin()">Masuk</button>
-            </div>
+    <div id="activity" class="content-section">
+        <div style="padding: 60px 24px 20px 24px;">
+            <h2 id="activityTitle">Layanan</h2>
+        </div>
+        <div id="activityContent"></div>
+    </div>
 
-            <div class="switch" id="switchBtn" onclick="showRegister()">
-                Belum punya akun? <b>Daftar</b>
+    <div id="pay" class="content-section">
+        <div style="padding: 80px 24px; text-align: center;">
+            <div class="form-card">
+                <div style="font-size: 50px; margin-bottom: 20px; color: var(--current-accent);"><i class="fas fa-qrcode"></i></div>
+                <h3 style="margin: 0 0 10px 0;">SCAN PEMBAYARAN</h3>
+                <p style="color: var(--mecha-dim); font-size: 13px;">Arahkan kamera ke kode QR mekanik untuk membayar.</p>
+                <button class="btn-action" style="margin-top: 20px;">Buka Kamera</button>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <div id="wallet" class="content-section">
+        <div style="padding: 60px 24px 20px 24px;">
+            <h2>Riwayat</h2>
+        </div>
+        <div id="historyList"></div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
-            authDomain: "mechajob-v3.firebaseapp.com",
-            projectId: "mechajob-v3",
-            storageBucket: "mechajob-v3.firebasestorage.app",
-            messagingSenderId: "987474678188",
-            appId: "1:987474678188:web:950ccca56653af0c51aa09"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // --- UI NAVIGATION ---
-        window.goToAuth = () => {
-            const landing = document.getElementById('landing-section');
-            const authSec = document.getElementById('auth-section');
-
-            landing.style.opacity = '0';
-            landing.style.transform = 'scale(0.9)';
-            
-            setTimeout(() => {
-                landing.style.display = 'none';
-                authSec.style.display = 'block';
-                setTimeout(() => {
-                    authSec.style.opacity = '1';
-                    authSec.style.transform = 'translateY(0)';
-                }, 50);
-            }, 600);
-        };
-
-        window.togglePassword = (id, el) => {
-            const x = document.getElementById(id);
-            if (x.type === "password") {
-                x.type = "text";
-                el.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                x.type = "password";
-                el.classList.replace("fa-eye-slash", "fa-eye");
-            }
-        };
-
-        // --- AUTH LOGIC ---
-        window.handleLogin = async () => {
-            const email = document.getElementById('login_email').value;
-            const password = document.getElementById('login_password').value;
-            const btn = document.getElementById('btnAction');
-
-            if(!email || !password) return alert("Silakan isi semua kolom!");
-            
-            btn.disabled = true;
-            btn.innerText = "Memproses...";
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // Redirect dilakukan otomatis oleh onAuthStateChanged
-            } catch (e) {
-                alert("Gagal Login: Email atau Password salah.");
-                btn.disabled = false;
-                btn.innerText = "Masuk";
-            }
-        };
-
-        window.showRegister = () => {
-            document.getElementById('title').innerText = "BUAT AKUN";
-            document.getElementById('formContent').innerHTML = `
-                <div class="input-box"><input type="text" id="reg_nama" placeholder="Nama Lengkap"></div>
-                <div class="input-box"><input type="tel" id="reg_noWa" placeholder="Nomor WhatsApp"></div>
-                <div class="input-box"><input type="email" id="reg_email" placeholder="Email"></div>
-                <div class="input-box">
-                    <input type="password" id="reg_password" placeholder="Sandi">
-                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_password', this)"></i>
+    <div id="profile" class="content-section">
+        <div class="header-section">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="width: 70px; height: 70px; background: #333; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                    <i class="fas fa-user"></i>
                 </div>
-                <div class="input-box">
-                    <input type="password" id="reg_confirm" placeholder="Konfirmasi Sandi">
-                    <i class="fa fa-eye toggle-pass" onclick="togglePassword('reg_confirm', this)"></i>
+                <div>
+                    <h2 id="profileNameDisplay" style="margin:0; font-weight: 800;">MEMUAT...</h2>
+                    <div id="userRole" style="font-size:10px; font-weight:bold; letter-spacing: 1px; margin-top: 4px;"></div>
                 </div>
-                <button class="btn-main" id="btnAction" onclick="handleRegister()">Daftar Sekarang</button>
-            `;
-            document.getElementById('switchBtn').innerHTML = "Sudah punya akun? <b>Login</b>";
-            document.getElementById('switchBtn').onclick = () => location.reload();
+            </div>
+        </div>
+
+        <div class="mode-selector">
+            <div id="custBtn" class="mode-btn active" onclick="setMode('customer')">CUSTOMER</div>
+            <div id="mechBtn" class="mode-btn" onclick="setMode('mechanic')">MECHANIC</div>
+        </div>
+
+        <div id="statsGrid" class="stats-grid"></div>
+        <div id="mainMenuList"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage(this, 'home')" id="navHome">
+            <i class="fas fa-house"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'activity')" id="navOrder">
+            <i class="fas fa-plus-circle"></i><span>Order</span>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'pay')">
+            <div class="pay-circle"><i class="fas fa-bolt"></i></div>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'wallet')" id="navHistory">
+            <i class="fas fa-receipt"></i><span>Logs</span>
+        </div>
+        <div class="nav-item" onclick="switchPage(this, 'profile')" id="navProfile">
+            <i class="fas fa-user-circle"></i><span>Profil</span>
+        </div>
+    </nav>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
+        authDomain: "mechajob-v3.firebaseapp.com",
+        projectId: "mechajob-v3",
+        storageBucket: "mechajob-v3.firebasestorage.app",
+        messagingSenderId: "987474678188",
+        appId: "1:987474678188:web:950ccca56653af0c51aa09"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global Order Function
+    window.kirimOrder = async () => {
+        const btn = document.getElementById('btnBooking');
+        if (!auth.currentUser) return alert("Silakan login!");
+
+        const data = {
+            uid: auth.currentUser.uid,
+            customerName: document.getElementById('inName').value,
+            whatsapp: document.getElementById('inWa').value,
+            vehicle: document.getElementById('inVehicle').value,
+            service: document.getElementById('inService').value,
+            address: document.getElementById('inAddress').value,
+            note: document.getElementById('inNote').value,
+            status: "pending",
+            createdAt: serverTimestamp()
         };
 
-        window.handleRegister = async () => {
-            const nama = document.getElementById('reg_nama').value;
-            const noWa = document.getElementById('reg_noWa').value;
-            const email = document.getElementById('reg_email').value;
-            const password = document.getElementById('reg_password').value;
-            const confirm = document.getElementById('reg_confirm').value;
-            const btn = document.getElementById('btnAction');
+        if (!data.customerName || !data.address || !data.whatsapp) return alert("Mohon lengkapi data wajib!");
 
-            if(!nama || !noWa || !email || !password || !confirm) return alert("Lengkapi data!");
-            if(password !== confirm) return alert("Sandi konfirmasi tidak sama!");
+        try {
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
+            await addDoc(collection(db, "bookings"), data);
+            alert("Booking Berhasil!");
+            location.reload();
+        } catch (e) {
+            alert("Gagal: " + e.message);
+            btn.disabled = false; btn.innerText = "KONFIRMASI PESANAN";
+        }
+    };
 
-            btn.disabled = true;
-            btn.innerText = "Mendaftarkan...";
-
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
             try {
-                const cred = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    uid: cred.user.uid,
-                    name: nama,
-                    noWa: noWa,
-                    email: email,
-                    role: "customer",
-                    createdAt: new Date()
-                });
-                alert("Berhasil Daftar!");
-            } catch (e) {
-                alert("Gagal: " + e.message);
-                btn.disabled = false;
-                btn.innerText = "Daftar Sekarang";
-            }
-        };
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('profileNameDisplay').innerText = data.name.toUpperCase();
+                    document.getElementById('welcomeText').innerText = `Halo, ${data.name}!`;
+                    document.getElementById('userRole').innerText = (data.role || "MEMBER").toUpperCase();
+                }
+            } catch (error) { console.error(error); }
+        } else {
+            window.location.href = "index.html";
+        }
+    });
+</script>
 
-        // --- OBSERVER ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Pastikan path ini benar sesuai struktur folder Anda
-                window.location.href = "pages/dashboard/dashboard.html";
-            }
-        });
-    </script>
+<script>
+    function switchPage(el, id) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function setMode(mode) {
+        const body = document.getElementById('mainBody');
+        const role = document.getElementById('userRole');
+        const grid = document.getElementById('statsGrid');
+        const menuList = document.getElementById('mainMenuList');
+        const balanceCard = document.getElementById('balanceCard');
+        const actContent = document.getElementById('activityContent');
+        const welcome = document.getElementById('welcomeText');
+
+        if(mode === 'mechanic') {
+            body.classList.add('mode-mechanic');
+            document.getElementById('mechBtn').classList.add('active');
+            document.getElementById('custBtn').classList.remove('active');
+            role.innerText = "EXPERT MECHANIC • LV. 42";
+            role.style.color = "var(--mecha-blue)";
+            welcome.innerText = "Work Mode: ON";
+
+            grid.innerHTML = `
+                <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
+                <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
+                <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
+
+            balanceCard.innerHTML = `
+                <small style="color:var(--mecha-dim)">PENDAPATAN</small>
+                <h1 style="margin:5px 0">Rp 00.000</h1>
+                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Withdraw Saldo</button>`;
+
+            actContent.innerHTML = `
+                <div class="form-card">
+                    <h3>Pesanan Masuk</h3>
+                    <p style="font-size:12px; color:var(--mecha-dim)">1 pesanan di radius 2km</p>
+                    <hr style="border:0; border-top:1px solid var(--mecha-border); margin:15px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Vario 150 - Ganti Oli</span>
+                        <button class="btn-action" style="width:80px; padding:8px; font-size:10px;">Ambil</button>
+                    </div>
+                </div>`;
+
+            menuList.innerHTML = `
+                <div class="menu-row"><span>Status Bengkel (Aktif)</span><i class="fas fa-toggle-on" style="color:#00ff88"></i></div>
+                <div class="menu-row"><span>Alat & Inventaris</span><i class="fas fa-toolbox"></i></div>
+                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+        } else {
+            body.classList.remove('mode-mechanic');
+            document.getElementById('custBtn').classList.add('active');
+            document.getElementById('mechBtn').classList.remove('active');
+            role.innerText = "PREMIUM MEMBER • ELITE";
+            role.style.color = "var(--mecha-orange)";
+
+            grid.innerHTML = `
+                <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div>
+                <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>2</b></div>
+                <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
+
+            balanceCard.innerHTML = `
+                <small style="color:var(--mecha-dim)">SALDO MECHAPAY</small>
+                <h1 style="margin:5px 0">Rp 54.200</h1>
+                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Top Up Saldo</button>`;
+
+            actContent.innerHTML = `
+                <div class="form-card" style="margin:0 24px;">
+                    <h3 style="margin-bottom:5px;">Pesan Mekanik</h3>
+                    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Lengkapi data layanan kunjungan.</p>
+                    
+                    <span class="order-label">Nama Lengkap</span>
+                    <input type="text" id="inName" class="order-input" placeholder="Masukkan nama Anda">
+
+                    <span class="order-label">No. WhatsApp</span>
+                    <input type="number" id="inWa" class="order-input" placeholder="Contoh: 0812345678">
+
+                    <span class="order-label">Tipe/Merk Kendaraan</span>
+                    <input type="text" id="inVehicle" class="order-input" placeholder="Contoh: Honda Vario 150">
+
+                    <span class="order-label">Jenis Layanan</span>
+                    <select id="inService" class="order-input" style="background:#1a1a1c">
+                        <option>Ganti Oli</option>
+                        <option>Service Rutin</option>
+                        <option>Mogok (Emergency)</option>
+                    </select>
+
+                    <span class="order-label">Alamat Penjemputan</span>
+                    <textarea id="inAddress" class="order-input" style="height:80px;" placeholder="Jl. Nama Jalan, No, Patokan..."></textarea>
+
+                    <span class="order-label">Catatan Keluhan</span>
+                    <textarea id="inNote" class="order-input" style="height:80px;" placeholder="Apa masalah kendaraan Anda?"></textarea>
+
+                    <button class="btn-action" id="btnBooking" onclick="window.kirimOrder()" style="margin-top:25px;">KONFIRMASI PESANAN</button>
+                </div>`;
+
+            menuList.innerHTML = `
+                <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
+                <div class="menu-row"><span>Garansi & Klaim</span><i class="fas fa-shield-halved"></i></div>
+                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+        }
+    }
+    setMode('customer');
+</script>
 </body>
 </html>
