@@ -185,55 +185,9 @@
             <i class="fas fa-user-circle"></i><span>Profil</span>
         </div>
     </nav>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
-        authDomain: "mechajob-v3.firebaseapp.com",
-        projectId: "mechajob-v3",
-        storageBucket: "mechajob-v3.firebasestorage.app",
-        messagingSenderId: "987474678188",
-        appId: "1:987474678188:web:950ccca56653af0c51aa09"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    // Update Nama di Profil & Home
-                    const nameDisplay = document.getElementById('profileNameDisplay');
-                    const welcomeText = document.getElementById('welcomeText');
-                    
-                    if (nameDisplay) nameDisplay.innerText = data.name.toUpperCase();
-                    if (welcomeText) welcomeText.innerText = `Halo, ${data.name}!`;
-                    
-                    console.log("Profil dimuat:", data.name);
-                }
-            } catch (error) {
-                console.error("Gagal memuat profil:", error);
-            }
-        } else {
-            // Jika tidak login, arahkan ke index
-            window.location.href = "index.html";
-        }
-    });
-</script>
-
-<script>
-    function switchPage(el, id) {
+ <script>
+    // Daftarkan ke window agar bisa dipanggil dari Script Module di atas
+    window.switchPage = function(el, id) {
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -241,7 +195,7 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    function setMode(mode) {
+    window.setMode = function(mode) {
         const body = document.getElementById('mainBody');
         const role = document.getElementById('userRole');
         const grid = document.getElementById('statsGrid');
@@ -262,6 +216,10 @@
                 <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
 
             balanceCard.innerHTML = `<small>PENDAPATAN</small><h1>Rp 450.000</h1><button class="btn-action">Withdraw</button>`;
+            
+            // Konten untuk mekanik
+            if(actContent) actContent.innerHTML = `<div class="form-card"><h3>Daftar Pesanan</h3><p>Belum ada pesanan masuk.</p></div>`;
+
             menuList.innerHTML = `
                 <div class="menu-row"><span>Status Bengkel</span><i class="fas fa-toggle-on"></i></div>
                 <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
@@ -278,77 +236,31 @@
                 <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
 
             balanceCard.innerHTML = `<small>SALDO MECHAPAY</small><h1>Rp 54.200</h1><button class="btn-action">Top Up</button>`;
+            
+            // PANGGIL ORDER.HTML SECARA OTOMATIS
+            if(actContent) {
+                fetch('pages/order/order.html')
+                    .then(res => res.text())
+                    .then(html => {
+                        actContent.innerHTML = html;
+                        // Jalankan script di dalam order.html
+                        const scripts = actContent.querySelectorAll("script");
+                        scripts.forEach(oldScript => {
+                            const newScript = document.createElement("script");
+                            newScript.text = oldScript.text;
+                            oldScript.parentNode.replaceChild(newScript, oldScript);
+                        });
+                    })
+                    .catch(err => { actContent.innerHTML = "Gagal memuat layanan."; });
+            }
+
             menuList.innerHTML = `
                 <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
                 <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
         }
     }
-    setMode('customer');
-</script>
-
-<script>
-    function switchPage(el, id) {
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    function setMode(mode) {
-        const body = document.getElementById('mainBody');
-        const role = document.getElementById('userRole');
-        const grid = document.getElementById('statsGrid');
-        const menuList = document.getElementById('mainMenuList');
-        const balanceCard = document.getElementById('balanceCard');
-        const actContent = document.getElementById('activityContent');
-
-        if(mode === 'mechanic') {
-            body.classList.add('mode-mechanic');
-            document.getElementById('mechBtn').classList.add('active');
-            document.getElementById('custBtn').classList.remove('active');
-            
-            grid.innerHTML = `
-                <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
-                <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
-                <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
-
-            balanceCard.innerHTML = `<small>PENDAPATAN</small><h1>Rp 0</h1><button class="btn-action" style="font-size:12px; padding:10px;">Withdraw</button>`;
-            
-            actContent.innerHTML = `<div class="form-card"><h3>Pesanan Masuk</h3><p>Belum ada pesanan di sekitarmu.</p></div>`;
-            
-            menuList.innerHTML = `<div class="menu-row"><span>Status Bengkel</span><i class="fas fa-toggle-on"></i></div>`;
-        } else {
-            body.classList.remove('mode-mechanic');
-            document.getElementById('custBtn').classList.add('active');
-            document.getElementById('mechBtn').classList.remove('active');
-
-            grid.innerHTML = `
-                <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>0k</b></div>
-                <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>1</b></div>
-                <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>0</b></div>`;
-
-            balanceCard.innerHTML = `<small>SALDO MECHAPAY</small><h1>Rp 0</h1><button class="btn-action" style="font-size:12px; padding:10px;">Top Up</button>`;
-
-            // PANGGIL ORDER.HTML
-            fetch('pages/order/order.html')
-                .then(res => res.text())
-                .then(html => {
-                    actContent.innerHTML = html;
-                    const scripts = actContent.querySelectorAll("script");
-                    scripts.forEach(oldScript => {
-                        const newScript = document.createElement("script");
-                        newScript.text = oldScript.text;
-                        oldScript.parentNode.replaceChild(newScript, oldScript);
-                    });
-                })
-                .catch(err => { actContent.innerHTML = "Gagal memuat form."; });
-
-            menuList.innerHTML = `<div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>`;
-        }
-    }
-
-    // Jalankan mode awal setelah semua elemen siap
-    window.onload = () => setMode('customer');
+    // Hapus setMode('customer') di sini, biar dipanggil oleh Firebase Module saja
 </script>
 </body>
 </html>
+
