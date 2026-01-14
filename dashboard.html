@@ -261,112 +261,78 @@
         }
     });
 </script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script>
-    function switchPage(el, id) {
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
+    const firebaseConfig = {
+        apiKey: "AIzaSyBrluSpKYvgZzz3CjH69SqQp81ydjqI5sI",
+        authDomain: "mechajob-v3.firebaseapp.com",
+        projectId: "mechajob-v3",
+        storageBucket: "mechajob-v3.firebasestorage.app",
+        messagingSenderId: "987474678188",
+        appId: "1:987474678188:web:950ccca56653af0c51aa09"
+    };
 
-    function setMode(mode) {
-        const body = document.getElementById('mainBody');
-        const role = document.getElementById('userRole');
-        const grid = document.getElementById('statsGrid');
-        const menuList = document.getElementById('mainMenuList');
-        const balanceCard = document.getElementById('balanceCard');
-        const actContent = document.getElementById('activityContent');
-        const welcome = document.getElementById('welcomeText');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        if(mode === 'mechanic') {
-            body.classList.add('mode-mechanic');
-            document.getElementById('mechBtn').classList.add('active');
-            document.getElementById('custBtn').classList.remove('active');
-            role.innerText = "EXPERT MECHANIC • LV. 42";
-            role.style.color = "var(--mecha-blue)";
-            welcome.innerText = "Work Mode: ON";
+    // Fungsi kirimOrder di dalam module
+    async function kirimOrder() {
+        const btn = document.getElementById('btnBooking');
+        if (!auth.currentUser) return alert("Silakan login!");
 
-            grid.innerHTML = `
-                <div class="stat-item"><i class="fas fa-star"></i><small>Rating</small><b>4.9</b></div>
-                <div class="stat-item"><i class="fas fa-check-double"></i><small>Done</small><b>128</b></div>
-                <div class="stat-item"><i class="fas fa-award"></i><small>Rank</small><b>Pro</b></div>`;
+        const data = {
+            uid: auth.currentUser.uid,
+            customerName: document.getElementById('inName').value,
+            whatsapp: document.getElementById('inWa').value,
+            vehicle: document.getElementById('inVehicle').value,
+            service: document.getElementById('inService').value,
+            address: document.getElementById('inAddress').value,
+            note: document.getElementById('inNote').value,
+            status: "pending",
+            createdAt: serverTimestamp()
+        };
 
-            balanceCard.innerHTML = `
-                <small style="color:var(--mecha-dim)">PENDAPATAN</small>
-                <h1 style="margin:5px 0">Rp 00.000</h1>
-                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Withdraw Saldo</button>`;
+        if (!data.customerName || !data.address || !data.whatsapp) {
+            alert("Mohon lengkapi data wajib!");
+            return;
+        }
 
-            actContent.innerHTML = `
-                <div class="form-card">
-                    <h3>Pesanan Masuk</h3>
-                    <p style="font-size:12px; color:var(--mecha-dim)">1 pesanan di radius 2km</p>
-                    <hr style="border:0; border-top:1px solid var(--mecha-border); margin:15px 0;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>Vario 150 - Ganti Oli</span>
-                        <button class="btn-action" style="width:80px; padding:8px; font-size:10px;">Ambil</button>
-                    </div>
-                </div>`;
-
-            menuList.innerHTML = `
-                <div class="menu-row"><span>Status Bengkel (Aktif)</span><i class="fas fa-toggle-on" style="color:#00ff88"></i></div>
-                <div class="menu-row"><span>Alat & Inventaris</span><i class="fas fa-toolbox"></i></div>
-                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
-        } else {
-            body.classList.remove('mode-mechanic');
-            document.getElementById('custBtn').classList.add('active');
-            document.getElementById('mechBtn').classList.remove('active');
-            role.innerText = "PREMIUM MEMBER • ELITE";
-            role.style.color = "var(--mecha-orange)";
-
-            grid.innerHTML = `
-                <div class="stat-item"><i class="fas fa-wallet"></i><small>Saldo</small><b>54k</b></div>
-                <div class="stat-item"><i class="fas fa-motorcycle"></i><small>Unit</small><b>2</b></div>
-                <div class="stat-item"><i class="fas fa-gift"></i><small>Poin</small><b>1.2k</b></div>`;
-
-            balanceCard.innerHTML = `
-                <small style="color:var(--mecha-dim)">SALDO MECHAPAY</small>
-                <h1 style="margin:5px 0">Rp 54.200</h1>
-                <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Top Up Saldo</button>`;
-
-            actContent.innerHTML = `
-                <div class="form-card" style="margin:0 24px;">
-                    <h3 style="margin-bottom:5px;">Pesan Mekanik</h3>
-                    <p style="font-size:12px; color:var(--mecha-dim); margin-bottom:20px;">Lengkapi data layanan kunjungan.</p>
-                    
-                    <span class="order-label">Nama Lengkap</span>
-                    <input type="text" id="inName" class="order-input" placeholder="Masukkan nama Anda">
-
-                    <span class="order-label">No. WhatsApp</span>
-                    <input type="number" id="inWa" class="order-input" placeholder="Contoh: 0812345678">
-
-                    <span class="order-label">Tipe/Merk Kendaraan</span>
-                    <input type="text" id="inVehicle" class="order-input" placeholder="Contoh: Honda Vario 150">
-
-                    <span class="order-label">Jenis Layanan</span>
-                    <select id="inService" class="order-input" style="background:#1a1a1c">
-                        <option>Ganti Oli</option>
-                        <option>Service Rutin</option>
-                        <option>Mogok (Emergency)</option>
-                    </select>
-
-                    <span class="order-label">Alamat Penjemputan</span>
-                    <textarea id="inAddress" class="order-input" style="height:80px;" placeholder="Jl. Nama Jalan, No, Patokan..."></textarea>
-
-                    <span class="order-label">Catatan Keluhan</span>
-                    <textarea id="inNote" class="order-input" style="height:80px;" placeholder="Apa masalah kendaraan Anda?"></textarea>
-
-                    <button class="btn-action" id="btnBooking" onclick="window.kirimOrder()" style="margin-top:25px;">KONFIRMASI PESANAN</button>
-                </div>`;
-
-            menuList.innerHTML = `
-                <div class="menu-row"><span>Metode Pembayaran</span><i class="fas fa-credit-card"></i></div>
-                <div class="menu-row"><span>Garansi & Klaim</span><i class="fas fa-shield-halved"></i></div>
-                <div class="menu-row" style="color:#ff4444" onclick="location.href='index.html'"><span>Logout</span><i class="fas fa-power-off"></i></div>`;
+        try {
+            btn.disabled = true; 
+            btn.innerText = "MENGIRIM...";
+            await addDoc(collection(db, "bookings"), data);
+            alert("Booking Berhasil!");
+            location.reload();
+        } catch (e) {
+            alert("Gagal: " + e.message);
+            btn.disabled = false; 
+            btn.innerText = "KONFIRMASI PESANAN";
         }
     }
-    setMode('customer');
+
+    // WAJIB: Ekspos fungsi ke window agar bisa dipanggil oleh onclick di HTML dinamis
+    window.kirimOrder = kirimOrder;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('profileNameDisplay').innerText = data.name.toUpperCase();
+                    document.getElementById('welcomeText').innerText = `Halo, ${data.name}!`;
+                    document.getElementById('userRole').innerText = (data.role || "MEMBER").toUpperCase();
+                }
+            } catch (error) { console.error(error); }
+        } else {
+            // window.location.href = "index.html"; // Aktifkan jika ingin proteksi login
+        }
+    });
 </script>
 </body>
 </html>
