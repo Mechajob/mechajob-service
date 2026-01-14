@@ -298,16 +298,9 @@
                 <h1 style="margin:5px 0">Rp 00.000</h1>
                 <button class="btn-action" style="margin-top:10px; font-size:12px; padding:10px;">Withdraw Saldo</button>`;
 
-            actContent.innerHTML = `
-                <div class="form-card">
-                    <h3>Pesanan Masuk</h3>
-                    <p style="font-size:12px; color:var(--mecha-dim)">1 pesanan di radius 2km</p>
-                    <hr style="border:0; border-top:1px solid var(--mecha-border); margin:15px 0;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>Vario 150 - Ganti Oli</span>
-                        <button class="btn-action" style="width:80px; padding:8px; font-size:10px;">Ambil</button>
-                    </div>
-                </div>`;
+              // --- PERUBAHAN DI SINI ---
+            actContent.innerHTML = '<div class="form-card"><p style="text-align:center;">Menghubungkan ke radar...</p></div>';
+            window.loadMechanicOrders(); // Memanggil data dari Firebase
 
             menuList.innerHTML = `
                 <div class="menu-row"><span>Status Bengkel (Aktif)</span><i class="fas fa-toggle-on" style="color:#00ff88"></i></div>
