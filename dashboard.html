@@ -135,21 +135,12 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); }
         }
         
-        /* --- CHAT FLOATING UI --- */
-.chat-fab {
-    position: fixed; bottom: 120px; right: 24px;
-    width: 60px; height: 60px; background: var(--current-accent);
-    border-radius: 50%; display: none; align-items: center; justify-content: center;
-    color: #000; font-size: 24px; box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    z-index: 10001; cursor: pointer; border: none;
-}
-
+        /* --- CHAT SYSTEM UI --- */
 .chat-window {
     position: fixed; bottom: 0; left: 0; width: 100%; height: 100%;
     background: var(--mecha-bg); z-index: 20000;
     display: none; flex-direction: column; animation: slideUp 0.3s ease;
 }
-
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .chat-header {
@@ -170,6 +161,14 @@
 .chat-input-area {
     padding: 20px; background: var(--mecha-panel);
     display: flex; gap: 10px; padding-bottom: 40px;
+}
+
+.btn-chat-inline {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--mecha-border);
+    color: #fff; padding: 8px 15px; border-radius: 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
 }
 
     </style>
@@ -250,21 +249,27 @@
     </nav>
 
 <script type="module">
-// Tambahkan Variabel Global untuk Chat
-let activeOrderId = null;
-let chatUnsubscribe = null;
+let currentChatId = null;
+let chatUnsub = null;
 
 // Fungsi Buka/Tutup Chat
-window.toggleChat = (show) => {
-    document.getElementById('chatWindow').style.display = show ? 'flex' : 'none';
+window.toggleChat = (show, orderId = null) => {
+    const win = document.getElementById('chatWindow');
+    win.style.display = show ? 'flex' : 'none';
+    if(show && orderId) {
+        currentChatId = orderId;
+        listenChat(orderId);
+    } else {
+        if(chatUnsub) chatUnsub();
+    }
 };
 
 // Fungsi Kirim Chat
 window.sendChat = async () => {
     const input = document.getElementById('chatInput');
-    if (!input.value.trim() || !activeOrderId) return;
+    if (!input.value.trim() || !currentChatId) return;
 
-    await addDoc(collection(db, "bookings", activeOrderId, "messages"), {
+    await addDoc(collection(db, "bookings", currentChatId, "messages"), {
         senderId: auth.currentUser.uid,
         text: input.value,
         timestamp: serverTimestamp()
@@ -272,55 +277,85 @@ window.sendChat = async () => {
     input.value = "";
 };
 
-// Fungsi Listen Pesan (Real-time)
+// Listen Chat Real-time
 const listenChat = (orderId) => {
-    activeOrderId = orderId;
-    document.getElementById('chatFab').style.display = 'flex';
-    
-    if (chatUnsubscribe) chatUnsubscribe();
-    
     const q = query(collection(db, "bookings", orderId, "messages"), orderBy("timestamp", "asc"));
-    chatUnsubscribe = onSnapshot(q, (snap) => {
-        const container = document.getElementById('chatMessages');
-        container.innerHTML = "";
-        snap.forEach(doc => {
-            const data = doc.data();
-            const isMe = data.senderId === auth.currentUser.uid;
-            container.innerHTML += `<div class="msg ${isMe ? 'me' : 'them'}">${data.text}</div>`;
+    chatUnsub = onSnapshot(q, (snap) => {
+        const box = document.getElementById('chatMessages');
+        box.innerHTML = "";
+        snap.forEach(d => {
+            const m = d.data();
+            const isMe = m.senderId === auth.currentUser.uid;
+            box.innerHTML += `<div class="msg ${isMe ? 'me' : 'them'}">${m.text}</div>`;
         });
-        container.scrollTop = container.scrollHeight;
+        box.scrollTop = box.scrollHeight;
     });
 };
 
-// --- UPDATE MONITOR PESANAN AKTIF ---
-// Ubah fungsi monitorActiveOrder yang lama dengan ini agar otomatis mendeteksi chat
+// UPDATE: Monitor Pesanan Aktif (Customer)
 window.monitorActiveOrder = () => {
-    if (!auth.currentUser) return;
-
-    // Cari pesanan dimana user adalah Customer ATAU Mekanik
-    const q = query(collection(db, "bookings"), 
-        where("status", "==", "proses")
-    );
+    const dashboard = document.getElementById('activeOrderDashboard');
+    const q = query(collection(db, "bookings"), where("uid", "==", auth.currentUser.uid), where("status", "==", "proses"));
 
     onSnapshot(q, (snap) => {
-        let orderFound = null;
-        snap.forEach(doc => {
-            const d = doc.data();
-            if (d.uid === auth.currentUser.uid || d.mechanicId === auth.currentUser.uid) {
-                orderFound = { id: doc.id, ...d };
-            }
-        });
-
-        if (orderFound) {
-            listenChat(orderFound.id); // Aktifkan chat jika ada pesanan 'proses'
-            // Logika update dashboard (sama seperti kode lama Anda)
-            updateDashboardUI(orderFound); 
-        } else {
-            document.getElementById('chatFab').style.display = 'none';
-            if (chatUnsubscribe) chatUnsubscribe();
-        }
+        if (snap.empty) { dashboard.innerHTML = ""; return; }
+        const docSnap = snap.docs[0];
+        const order = docSnap.data();
+        dashboard.innerHTML = `
+            <div class="form-card active-order-badge">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;">${order.service}</h3>
+                    <button class="btn-chat-inline" onclick="toggleChat(true, '${docSnap.id}')">
+                        <i class="fas fa-comment"></i> Chat Mekanik
+                    </button>
+                </div>
+                <p style="font-size:12px; color:var(--mecha-dim); margin:10px 0;">Unit: ${order.vehicle}</p>
+                <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <span>Biaya: Rp ${order.price.toLocaleString()}</span>
+                    <span style="color:var(--mecha-orange)">${order.status.toUpperCase()}</span>
+                </div>
+            </div>`;
     });
 };
+
+// UPDATE: Radar Mekanik (Sekarang ada tombol chat untuk pesanan yang diproses)
+window.loadMechanicOrders = () => {
+    const actContent = document.getElementById('activityContent');
+    // Ambil pesanan Pending (Radar) ATAU Proses (Pesanan milik mekanik ini)
+    const q = query(collection(db, "bookings"), where("status", "in", ["pending", "proses"]));
+    
+    onSnapshot(q, (snap) => {
+        let html = `<div style="padding:0 24px 10px 24px;"><h3 style="margin:0;">Layanan Aktif</h3></div>`;
+        snap.forEach((docSnap) => {
+            const item = docSnap.data();
+            
+            // Logika Tampilan: Jika pending tampilkan radar, jika proses & milik saya tampilkan chat
+            if(item.status === "proses" && item.mechanicId === auth.currentUser.uid) {
+                html += `
+                <div class="form-card" style="border-left: 4px solid var(--mecha-blue);">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h4 style="margin:0;">${item.customerName}</h4>
+                        <button class="btn-chat-inline" style="border-color:var(--mecha-blue)" onclick="toggleChat(true, '${docSnap.id}')">
+                            <i class="fas fa-comment"></i> Chat User
+                        </button>
+                    </div>
+                    <p style="font-size:12px; margin:5px 0;">${item.service} - ${item.vehicle}</p>
+                    <button class="btn-action" style="margin-top:10px; background: #fff; font-size:10px; padding:8px;">SELESAIKAN KERJA</button>
+                </div>`;
+            } else if (item.status === "pending") {
+                // Tampilan Radar Biasa (kode Anda yang lama)
+                html += `
+                <div class="form-card">
+                    <h4 style="margin:0;">${item.service}</h4>
+                    <p style="font-size:12px; margin:5px 0;">${item.address}</p>
+                    <button class="btn-action" style="margin-top:10px; padding:10px;" onclick="window.ambilPesanan('${docSnap.id}')">TERIMA PESANAN</button>
+                </div>`;
+            }
+        });
+        actContent.innerHTML = html;
+    });
+};
+
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -571,19 +606,18 @@ window.monitorActiveOrder = () => {
     setMode('customer');
 </script>
 
-<button id="chatFab" class="chat-fab" onclick="toggleChat(true)">
-    <i class="fas fa-comment-dots"></i>
-</button>
-
 <div id="chatWindow" class="chat-window">
     <div class="chat-header">
-        <h3 style="margin:0; font-size:16px;">Chat Mekanik</h3>
-        <i class="fas fa-times" onclick="toggleChat(false)" style="cursor:pointer; padding:10px;"></i>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-chevron-left" onclick="toggleChat(false)"></i>
+            <h3 id="chatTargetName" style="margin:0; font-size:16px;">Chat</h3>
+        </div>
+        <span style="font-size:10px; color:var(--mecha-dim);">LIVE CHAT</span>
     </div>
     <div id="chatMessages"></div>
     <div class="chat-input-area">
         <input type="text" id="chatInput" class="order-input" placeholder="Tulis pesan...">
-        <button class="btn-action" onclick="sendChat()" style="width:60px; padding:10px;">
+        <button class="btn-action" onclick="sendChat()" style="width:50px; padding:0;">
             <i class="fas fa-paper-plane"></i>
         </button>
     </div>
